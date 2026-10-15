@@ -23,6 +23,7 @@ import argparse
 import csv
 import os
 import re
+import shutil
 import sys
 import time
 import urllib.parse
@@ -199,6 +200,14 @@ def main():
             w.writerows(rows)
         log(f"解析完成 {ok}/{len(rows)}，清单 {out}")
         log("直链公开可读、无签名，可直接 wget / 迅雷批量下载")
+        # 同步一份进仓库（data/ 默认被 git 跟踪），让 GitHub Actions 上的
+        # mailer.py 也能拿到 网关URL → OSS直链 映射，境外直接下附件
+        repo_copy = os.path.join(os.path.dirname(DEST), "data", "oss_links.csv")
+        try:
+            shutil.copyfile(out, repo_copy)
+            log(f"已同步仓库副本 {os.path.normpath(repo_copy)}")
+        except Exception as e:
+            log(f"⚠ 仓库副本同步失败（{e}），不影响 files/ 清单")
         return 0
 
     log(f"匹配到 {len(cand)} 个附件，探测大小中…")
