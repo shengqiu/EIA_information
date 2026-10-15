@@ -12,10 +12,20 @@
 
     python3 tools/fetch_remote.py --limit 20 --max-new 100   # 抓得更狠一点
     python3 tools/fetch_remote.py --dry-run                  # 只探活，不落盘
+    python3 tools/fetch_remote.py --resolve-missing          # 重试之前没解析出直链的附件
+```
+
+# 云函数现在已经「采集 + 解析附件直链」一次做完：
+#   网关 download?fileUrl=<密文> 只有境内才肯 302/301 到政务云 OSS，
+#   所以解析必须在云函数里做；解析出来的 OSS 直链无签名、境外可达，
+#   境外 Actions 沿着直链就能直接把附件传上 Google Drive（tools/to_drive.py）。
+# 拿到的直链按「网关地址」合并进 data/oss_links.csv —— 这份 CSV 是邮件
+# 和 Drive 同步的唯一数据来源。
 """
 
 import os
 import sys
+import csv
 import json
 import argparse
 import datetime
@@ -26,7 +36,66 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(ROOT, "data")
 ITEMS_PATH = os.path.join(DATA_DIR, "items.json")
 STATE_PATH = os.path.join(DATA_DIR, "state.json")
+CSV_PATH = os.path.join(DATA_DIR, "oss_links.csv")
+CSV_FIELDS = ["公告日期", "发布单位", "项目名称", "建设单位",
+              "文件名", "大小", "OSS直链", "网关地址"]
 KEEP_DAYS = 550          # 历史库只留 18 个月，和 monitor.py 保持一致
+
+
+def real_oss(url):
+    """真 OSS 直链判定（和 mailer / to_drive 保持一致）。
+    网关形态（带 fileUrl= 密文参数）不算，政务外网专用域名也是网关形态。"""
+    u = (url or "").strip()
+    return bool(u.startswith("http") and "fileUrl=" not in u
+                and "/api-gateway/" not in u)
+
+
+def load_csv_rows():
+    if not os.path.exists(CSV_PATH):
+        return []
+    with open(CSV_PATH, encoding="utf-8-sig") as f:
+        return [{k: (r.get(k) or "").strip() for k in CSV_FIELDS}
+                for r in csv.DictReader(f)]
+
+
+def upsert_links(rows, links):
+    """把云函数的解析结果按「网关地址」合并进 CSV。只有拿到真直链的才写。"""
+    idx = {r.get("网关地址", ""): r for r in rows}
+    added = updated = 0
+    for l in links:
+        gw = (l.get("网关地址") or "").strip()
+        oss = (l.get("OSS直链") or "").strip()
+        if not gw or not real_oss(oss):
+            continue
+        cur = idx.get(gw)
+        if cur is None:
+            new = {k: (l.get(k) or "").strip() for k in CSV_FIELDS}
+            rows.append(new)
+            idx[gw] = new
+            added += 1
+            continue
+        changed = False
+        for k in ("OSS直链", "大小", "文件名"):     # 这些以云函数的最新结果为准
+            v = (l.get(k) or "").strip()
+            if v and cur.get(k) != v:
+                cur[k] = v
+                changed = True
+        for k in ("公告日期", "发布单位", "项目名称", "建设单位"):   # 缺了才补
+            v = (l.get(k) or "").strip()
+            if v and not cur.get(k):
+                cur[k] = v
+                changed = True
+        if changed:
+            updated += 1
+    return added, updated
+
+
+def write_csv(rows):
+    with open(CSV_PATH, "w", encoding="utf-8-sig", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=CSV_FIELDS)
+        w.writeheader()
+        for r in rows:
+            w.writerow({k: r.get(k, "") for k in CSV_FIELDS})
 
 
 def load_json(path, default):
@@ -46,6 +115,10 @@ def main():
     ap.add_argument("--max-new", type=int, default=60)
     ap.add_argument("--timeout", type=int, default=300)
     ap.add_argument("--dry-run", action="store_true", help="只探活，不写文件")
+    ap.add_argument("--resolve-missing", action="store_true",
+                    help="不采集，只让云函数重试 CSV 里还没解析出直链的附件")
+    ap.add_argument("--max-resolve", type=int, default=40,
+                    help="单次最多解析几个附件（云函数串行解析，防超时）")
     args = ap.parse_args()
 
     url = os.environ.get("SCRAPE_URL", "").strip()
@@ -53,18 +126,23 @@ def main():
     if not url:
         sys.exit("缺少环境变量 SCRAPE_URL（境内云函数的 HTTP 地址）")
 
-    sep = "&" if "?" in url else "?"
-    if token:
-        url = f"{url}{sep}token={token}"
+    q = f"?token={token}" if token else ""
+    scrape_url = url + q
+    resolve_url = url.rstrip("/") + "/resolve" + q
+
+    if args.resolve_missing:
+        return do_resolve_missing(resolve_url, args)
 
     state = load_json(STATE_PATH, {"initialized": True, "seen": {}})
     seen = dict(state.get("seen") or {})
     items = load_json(ITEMS_PATH, [])
     print(f"本地在库 {len(items)} 条，已处理标记 {len(seen)} 个")
 
-    print(f"→ 调用云函数（limit={args.limit}, max_new={args.max_new}）")
-    r = requests.post(url,
-                      json={"seen": seen, "limit": args.limit, "max_new": args.max_new},
+    print(f"→ 调用云函数（limit={args.limit}, max_new={args.max_new}, "
+          f"max_resolve={args.max_resolve}）")
+    r = requests.post(scrape_url,
+                      json={"seen": seen, "limit": args.limit, "max_new": args.max_new,
+                            "resolve": True, "max_resolve": args.max_resolve},
                       timeout=args.timeout)
     print(f"← HTTP {r.status_code}, {len(r.content)} 字节")
     if r.status_code != 200:
@@ -79,6 +157,8 @@ def main():
     print(f"   扫描 {data.get('scanned')} 条 / 新解析 {data.get('parsed')} 条 / "
           f"失败 {data.get('failed')} 条 / 耗时 {data.get('elapsed_sec')}s / "
           f"栏目 {data.get('columns_ok')} 成功 {data.get('columns_failed')} 失败")
+    if data.get("attachments"):
+        print(f"   附件 {data.get('attachments')} 个 / 解析出直链 {data.get('resolved')} 个")
 
     fresh = data.get("new") or []
     if args.dry_run:
@@ -114,9 +194,58 @@ def main():
         json.dump({"initialized": True, "seen": data.get("seen") or seen},
                   f, ensure_ascii=False, indent=1)
 
+    # 云函数已经把新附件的网关地址解析成 OSS 直链了（境内才能跟随 302/301），
+    # 这里按「网关地址」合并进 CSV —— 邮件和 Google Drive 同步都读这份表
+    links = data.get("links") or []
+    if links:
+        rows = load_csv_rows()
+        csv_added, csv_updated = upsert_links(rows, links)
+        if csv_added or csv_updated:
+            write_csv(rows)
+        print(f"✅ 公告在库 {len(items)} 条（新增 {added}，清理 {dropped}）/ "
+              f"直链表 {len(rows)} 条（新增 {csv_added}，更新 {csv_updated}）")
+        print(f"::notice::公告 {len(items)} 条 / 新增 {added} / "
+              f"直链表 {len(rows)} 条（+{csv_added} ~{csv_updated}）")
+        return 0
+
     att = sum(len(p.get("附件链接", [])) for i in items for p in i.get("项目", []))
     print(f"✅ 在库 {len(items)} 条（新增 {added}，清理 {dropped}） / 附件 {att} 个")
     print(f"::notice::公告 {len(items)} 条 / 新增 {added} / 附件 {att} 个")
+    return 0
+
+
+def do_resolve_missing(resolve_url, args):
+    """把 CSV 里还没解析出直链的附件丢给云函数重试。
+    日常就几条（政务外网专用域名那种永远失败，重试失败也算有交代）。"""
+    rows = load_csv_rows()
+    missing = [r["网关地址"] for r in rows
+               if r.get("网关地址") and not real_oss(r.get("OSS直链", ""))]
+    if not missing:
+        print("没有缺直链的条目，跳过")
+        return 0
+    print(f"缺直链 {len(missing)} 条 → 交给云函数重试（{resolve_url.split('?')[0]}）")
+    try:
+        r = requests.post(resolve_url, json={"urls": missing}, timeout=args.timeout)
+    except Exception as e:
+        print(f"[warn] 调用失败：{e!r}")
+        return 1
+    print(f"← HTTP {r.status_code}, {len(r.content)} 字节")
+    if r.status_code != 200:
+        print(f"[warn] 云函数返回 {r.status_code}：{r.text[:300]}")
+        return 1
+    try:
+        out = r.json()
+    except Exception:
+        print(f"[warn] 响应不是 JSON：{r.text[:200]}")
+        return 1
+
+    added, updated = upsert_links(rows, out.get("links") or [])
+    if added or updated:
+        write_csv(rows)
+    left = len(missing) - len(out.get("links") or [])
+    print(f"✅ 补回 {len(out.get('links') or [])} 条（新增 {added} 更新 {updated}），"
+          f"仍缺 {left} 条；耗时 {out.get('elapsed_sec')}s")
+    print(f"::notice::补回直链 {len(out.get('links') or [])} 条 / 仍缺 {left} 条")
     return 0
 
 
