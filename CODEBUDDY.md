@@ -141,8 +141,14 @@ files/               ← gitignore（下载的附件本体）
       （每日 10:30 CST + 手动触发）。OSS 直链境外可达，rclone copyurl 流式上传，
       Service Account + 共享文件夹认证，`data/drive_state.json` 断点续跑。
       凭证只走 Secrets（`GDRIVE_SA_JSON` / `DRIVE_FOLDER_ID`）
-      - [ ] **待用户完成 Google 端一次性配置**（建 SA、建共享文件夹、加 2 个 secret）
-            后手动触发首跑；配置步骤见 `docs/04-附件下载.md`
+      - [ ] **卡在分享配置上（2026-10-15 首跑 101 个全挂）**：症状是全部文件
+            `failed to make directory: 404 File not found`。404（不是 401）说明 SA 密钥
+            没问题，是共享文件夹对它不可见。需用户在 Drive 网页把该文件夹分享给
+            SA 邮箱（`drive-save@clau-511714.iam.gserviceaccount.com`，编辑者）；
+            文件夹若在「共享云端硬盘」里，须把 SA 加为磁盘成员。代码侧已加
+            `probe_drive` 探活：访问不通就 10 秒内带排查清单退出，不再空跑 10 分钟；
+            回写步骤也改成先 `pull --rebase` 再推（首跑因并发提交被拒丢过状态）。
+            修好分享后手动触发 drive.yml 即可，state 会断点续跑
 - [x] **直链解析自动化（不用再手动 resolve）**：`cloud/main.py` 在采集时顺带把新附件的
       网关地址 302/301 解析成 OSS 直链（`resolve: true` / `max_resolve: 40`，串行+0.4s 间隔防限流），
       随 `links[]` 返回；新增 `POST /resolve` 端点给 Actions 重试失败条目。
