@@ -1,0 +1,62 @@
+name: 附件同步 Google Drive
+
+# 把 data/oss_links.csv 里的附件（OSS 直链）上传到 Google Drive。
+# OSS 直链境外可达（Actions 出口实测 206、250~324KB/s），所以下载+上传都能在
+# Actions 闭环；被挡的政务网网关全程不碰。公开仓库 Actions 免费。
+#
+# 凭证只走 GitHub Secrets，仓库里没有任何密钥：
+#   GDRIVE_SA_JSON    —— Service Account 的 JSON 密钥全文
+#   DRIVE_FOLDER_ID   —— 用户 Drive 里那个共享给 SA 的文件夹 ID
+# 一次性配置见 docs/04-附件下载.md「同步到 Google Drive」一节。
+#
+# 增量续跑：data/drive_state.json 记账，已传的跳过；每传完一个就落盘，中途挂了
+# 下次接着跑。新附件要等境内跑一次 download.py --resolve 补进映射表才会出现在这里。
+
+on:
+  schedule:
+    - cron: '30 2 * * *'   # 每天 10:30 CST，在 daily.yml 采集之后
+  workflow_dispatch:
+
+permissions:
+  contents: write          # 回写 data/drive_state.json 需要
+
+concurrency:
+  group: drive
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 装 rclone
+        run: curl https://rclone.org/install.sh | sudo bash
+
+      - name: 写服务账号密钥（只进 runner 临时目录，不进 git）
+        env:
+          SA_JSON: ${{ secrets.GDRIVE_SA_JSON }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/gdrive"
+          printf '%s' "$SA_JSON" > "$RUNNER_TEMP/gdrive/sa.json"
+
+      - name: 同步附件到 Drive
+        env:
+          RCLONE_CONFIG_GDRIVE_TYPE: drive
+          RCLONE_CONFIG_GDRIVE_SERVICE_ACCOUNT_FILE: ${{ runner.temp }}/gdrive/sa.json
+          RCLONE_CONFIG_GDRIVE_ROOT_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
+        run: python3 tools/to_drive.py
+
+      # Actions 无状态，必须把 drive_state.json 提交回去，下次才不会重传
+      - name: 回写同步状态
+        if: always()
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add data/drive_state.json
+          if git diff --cached --quiet; then
+            echo '::notice::无变化（没有新传文件）'
+          else
+            git commit -m "drive: 更新同步状态 $(date -u +%FT%TZ)"
+            git push origin "$(git branch --show-current)"
+          fi
