@@ -50,6 +50,21 @@ jobs:
           fi
           python3 tools/fetch_remote.py
 
+      # 云函数已经「采集 + 附件直链解析」一次做完：新公告带回来的 links 会被
+      # fetch_remote.py 合并进 data/oss_links.csv，Google Drive 同步直接读这份表。
+      # 之前解析失败的那几条（比如指向政务外网专用域名的），每天顺便重试一次。
+      # 失败无所谓，所以不带 || true 之外的后果。
+      - name: 重试没解析出直链的附件
+        if: ${{ vars.SCRAPE_MODE != 'local' }}
+        env:
+          SCRAPE_URL: ${{ secrets.SCRAPE_URL }}
+          SCRAPE_TOKEN: ${{ secrets.SCRAPE_TOKEN }}
+        run: |
+          if [ -z "$SCRAPE_URL" ]; then
+            exit 0
+          fi
+          python3 tools/fetch_remote.py --resolve-missing || true
+
       # 路线 B：本机直接抓 —— 只有境内 runner 才有效
       - name: 本机采集
         if: ${{ vars.SCRAPE_MODE == 'local' }}
