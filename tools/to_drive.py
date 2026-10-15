@@ -54,7 +54,8 @@ def parse_size(text):
     m = re.match(r"^\s*([\d.]+)\s*([KMGT]?B)\s*$", (text or "").upper())
     if not m:
         return 0
-    unit = {"B": 1, "KB": 10**3, "MB": 10**6, "GB": 10**9, "TB": 10**12}[m.group(2)]
+    # 1024 进制，和 data/oss_links.csv 既有写法（monitor/download.py 的 human）保持一致
+    unit = {"B": 1, "KB": 1024, "MB": 1024**2, "GB": 1024**3, "TB": 1024**4}[m.group(2)]
     return int(float(m.group(1)) * unit)
 
 
