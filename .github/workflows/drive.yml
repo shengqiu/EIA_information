@@ -46,6 +46,8 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/gdrive"
           printf '%s' "$SA_JSON" > "$RUNNER_TEMP/gdrive/sa.json"
+          # 打印 SA 邮箱（非敏感），方便核对 Drive 分享对象；私钥不进日志
+          python3 -c "import json; d=json.load(open('$RUNNER_TEMP/gdrive/sa.json')); print('SA 邮箱:', d['client_email'])"
 
       - name: 同步附件到 Drive
         env:
