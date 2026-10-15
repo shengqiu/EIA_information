@@ -87,7 +87,9 @@ tools/fetch_remote.py  调云函数取新公告并合并进 data/items.json
 tools/render.py      只渲染看板不采集（境外 runner 用）
 tools/download.py    附件下载 + OSS 直链解析
 tools/mailer.py      按「项目」逐封发邮件 + 附件打包（需 SMTP_* 环境变量）
+tools/to_drive.py    附件同步 Google Drive（rclone + Service Account，跑在 Actions）
 .github/workflows/pages.yml   只发布 reports/ 到 Pages（不采集）
+.github/workflows/drive.yml   附件每日同步 Google Drive（10:30 CST + 手动触发）
 data/  reports/      ← 已入库：Pages 的发布源就是仓库里的看板
 files/               ← gitignore（下载的附件本体）
 ```
@@ -130,3 +132,9 @@ files/               ← gitignore（下载的附件本体）
 - [x] `data/oss_links.csv` 已纳入仓库（81 条 OSS 直链映射，mailer 直接用；
       配合 `aria2` 可按直链整包拉附件）
 - [ ] 换 fine-grained token：现在用的是 classic PAT（repo+workflow），权限过大，且明文写在 git remote 里
+- [x] **附件同步 Google Drive 已上 Actions**：`tools/to_drive.py` + `.github/workflows/drive.yml`
+      （每日 10:30 CST + 手动触发）。OSS 直链境外可达，rclone copyurl 流式上传，
+      Service Account + 共享文件夹认证，`data/drive_state.json` 断点续跑。
+      凭证只走 Secrets（`GDRIVE_SA_JSON` / `DRIVE_FOLDER_ID`）
+      - [ ] **待用户完成 Google 端一次性配置**（建 SA、建共享文件夹、加 2 个 secret）
+            后手动触发首跑；配置步骤见 `docs/04-附件下载.md`
