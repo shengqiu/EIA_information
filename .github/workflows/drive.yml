@@ -13,8 +13,13 @@ name: 附件同步 Google Drive
 # 下次接着跑。新附件要等境内跑一次 download.py --resolve 补进映射表才会出现在这里。
 
 on:
+  # 主触发：每日采集跑完（daily.yml 已把云函数解析好的直链写进 data/oss_links.csv）
+  # 就紧接着同步，约 09:05 CST 开工。daily.yml 失败时不触发（也没新东西可传）。
+  workflow_run:
+    workflows: ["每日采集并发布（北京时间 09:00）"]
+    types: [completed]
   schedule:
-    - cron: '30 2 * * *'   # 每天 10:30 CST，在 daily.yml 采集之后
+    - cron: '30 2 * * *'   # 兜底：每天 10:30 CST。有 state 去重，重复跑几乎空转
   workflow_dispatch:
 
 permissions:
@@ -26,6 +31,8 @@ concurrency:
 
 jobs:
   sync:
+    # workflow_run 触发时才判上游结论；手动触发和定时跑不受影响
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
