@@ -49,11 +49,23 @@ jobs:
           # 打印 SA 邮箱（非敏感），方便核对 Drive 分享对象；私钥不进日志
           python3 -c "import json; d=json.load(open('$RUNNER_TEMP/gdrive/sa.json')); print('SA 邮箱:', d['client_email'])"
 
+      - name: 规范 Drive 配置环境变量
+        # secret 里可能意外带上换行/空格，导致 rclone 拿到的 ROOT_FOLDER_ID 是脏值
+        # （表现为 101 个文件全部 mkdir 404）。这里统一去掉空白并校验长度。
+        env:
+          DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
+        run: |
+          FID="$(printf '%s' "$DRIVE_FOLDER_ID" | tr -d '[:space:]')"
+          echo "ROOT_FOLDER_ID 长度 ${#FID}"
+          if [ "${#FID}" -lt 20 ] || [ "${#FID}" -gt 40 ]; then
+            echo "::warning::DRIVE_FOLDER_ID 长度 ${#FID} 异常（Google 文件夹 ID 一般 33 字符），请核对 secrets"
+          fi
+          echo "RCLONE_CONFIG_GDRIVE_ROOT_FOLDER_ID=$FID" >> "$GITHUB_ENV"
+
       - name: 同步附件到 Drive
         env:
           RCLONE_CONFIG_GDRIVE_TYPE: drive
           RCLONE_CONFIG_GDRIVE_SERVICE_ACCOUNT_FILE: ${{ runner.temp }}/gdrive/sa.json
-          RCLONE_CONFIG_GDRIVE_ROOT_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
         run: python3 tools/to_drive.py
 
       # Actions 无状态，必须把 drive_state.json 提交回去，下次才不会重传
@@ -67,5 +79,8 @@ jobs:
             echo '::notice::无变化（没有新传文件）'
           else
             git commit -m "drive: 更新同步状态 $(date -u +%FT%TZ)"
+            # 2026-10-15 首个运行就栽在这：同步跑了 10 分钟，期间别人推了新提交，
+            # 直接 push 被拒（non-fast-forward），状态文件丢失。先 rebase 再推。
+            git pull --rebase origin "$(git branch --show-current)"
             git push origin "$(git branch --show-current)"
           fi
