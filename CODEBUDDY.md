@@ -119,8 +119,10 @@ files/               ← gitignore（下载的附件本体）
 - [ ] **删除腾讯云子用户 `workbuddy` 并吊销其 SecretId/SecretKey**（部署已完成，密钥不必留）
 - [x] 备选：装 self-hosted runner（境内机器）+ 设 `RUNNER_LABEL=self-hosted`
       + `SCRAPE_MODE=local` —— 云函数通了，这条不必做了
-- [x] **按项目发邮件（链接模式）已上 Actions**：`tools/mailer.py` + `.github/workflows/mail.yml`
-      （每 2 小时跑 1 次、每次 1 封、`--link-only`），SMTP 凭证在 GitHub Secrets，
+- [x] **按项目发邮件（链接模式）**：`tools/mailer.py` + `.github/workflows/mail.yml`。
+      **定时任务已停用**（2026-10-15）——附件改走 Drive 后邮件不再是必经路径，
+      只在手动 Run workflow 时补发/看历史项目。恢复定时：把 mail.yml 里注释掉的两行加回来。
+      `--link-only` 必带（境外下载附件），SMTP 凭证在 GitHub Secrets，
       `data/mail_state.json` 跨运行回写续传。端到端实测通过（已发 5 封）
 - [x] **邮件附件区带 OSS 直链**：`data/oss_links.csv`（`网关URL → OSS直链` 映射，81/87 覆盖）
       已入库，mailer link 模式纯查表填充，Actions 上也能给出境外可下的直链。
