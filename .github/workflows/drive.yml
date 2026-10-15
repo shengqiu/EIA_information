@@ -4,9 +4,15 @@ name: 附件同步 Google Drive
 # OSS 直链境外可达（Actions 出口实测 206、250~324KB/s），所以下载+上传都能在
 # Actions 闭环；被挡的政务网网关全程不碰。公开仓库 Actions 免费。
 #
-# 凭证只走 GitHub Secrets，仓库里没有任何密钥：
-#   GDRIVE_SA_JSON    —— Service Account 的 JSON 密钥全文
-#   DRIVE_FOLDER_ID   —— 用户 Drive 里那个共享给 SA 的文件夹 ID
+# 凭证只走 GitHub Secrets，仓库里没有任何密钥。两种模式二选一：
+#   模式 1（Service Account，默认）：GDRIVE_SA_JSON + DRIVE_FOLDER_ID
+#     - 前提：目标文件夹在「共享云端硬盘」里且 SA 是磁盘成员。
+#     - SA 存储配额为 0，往「我的云端硬盘」传文件会被 Google 拒（403
+#       Service Accounts do not have storage quota）——2026-10-15 实测。
+#   模式 2（OAuth 用户授权）：GDRIVE_TOKEN + DRIVE_FOLDER_ID
+#     - 以用户本人身份上传，文件占用户 15GB 免费配额，免费个人账号可用。
+#     - token 获取：自己电脑跑 rclone authorize "drive"，浏览器登录后
+#       把输出的 JSON 存进 secret。配了 GDRIVE_TOKEN 就自动切到此模式。
 # 一次性配置见 docs/04-附件下载.md「同步到 Google Drive」一节。
 #
 # 增量续跑：data/drive_state.json 记账，已传的跳过；每传完一个就落盘，中途挂了
@@ -40,14 +46,30 @@ jobs:
       - name: 装 rclone
         run: curl https://rclone.org/install.sh | sudo bash
 
-      - name: 写服务账号密钥（只进 runner 临时目录，不进 git）
+      - name: 写 Drive 凭证（只进 runner 临时目录，不进 git）
         env:
           SA_JSON: ${{ secrets.GDRIVE_SA_JSON }}
+          DRIVE_TOKEN: ${{ secrets.GDRIVE_TOKEN }}
         run: |
           mkdir -p "$RUNNER_TEMP/gdrive"
-          printf '%s' "$SA_JSON" > "$RUNNER_TEMP/gdrive/sa.json"
-          # 打印 SA 邮箱（非敏感），方便核对 Drive 分享对象；私钥不进日志
-          python3 -c "import json; d=json.load(open('$RUNNER_TEMP/gdrive/sa.json')); print('SA 邮箱:', d['client_email'])"
+          if [ -n "$DRIVE_TOKEN" ]; then
+            # 模式 2：OAuth 用户授权。token 是 JSON blob，经 GITHUB_ENV  heredoc
+            # 传给 rclone（RCLONE_CONFIG_GDRIVE_TOKEN 必须是 JSON 本身，不是路径）
+            {
+              echo "RCLONE_CONFIG_GDRIVE_TOKEN<<GDRIVE_TOKEN_EOF"
+              printf '%s' "$DRIVE_TOKEN"
+              echo ""
+              echo "GDRIVE_TOKEN_EOF"
+            } >> "$GITHUB_ENV"
+            echo "::notice::Drive 凭证模式：OAuth 用户授权（文件占用户本人配额）"
+          else
+            # 模式 1：Service Account
+            printf '%s' "$SA_JSON" > "$RUNNER_TEMP/gdrive/sa.json"
+            echo "RCLONE_CONFIG_GDRIVE_SERVICE_ACCOUNT_FILE=$RUNNER_TEMP/gdrive/sa.json" >> "$GITHUB_ENV"
+            # 打印 SA 邮箱（非敏感），方便核对 Drive 分享对象；私钥不进日志
+            python3 -c "import json; d=json.load(open('$RUNNER_TEMP/gdrive/sa.json')); print('SA 邮箱:', d['client_email'])"
+            echo "::notice::Drive 凭证模式：Service Account（无存储配额，仅共享云端硬盘可传）"
+          fi
 
       - name: 规范 Drive 配置环境变量
         # secret 里可能意外带上换行/空格，导致 rclone 拿到的 ROOT_FOLDER_ID 是脏值
@@ -65,7 +87,6 @@ jobs:
       - name: 同步附件到 Drive
         env:
           RCLONE_CONFIG_GDRIVE_TYPE: drive
-          RCLONE_CONFIG_GDRIVE_SERVICE_ACCOUNT_FILE: ${{ runner.temp }}/gdrive/sa.json
         run: python3 tools/to_drive.py
 
       # Actions 无状态，必须把 drive_state.json 提交回去，下次才不会重传
