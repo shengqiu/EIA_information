@@ -1,13 +1,18 @@
 name: 按项目发邮件
 
-# 每 2 小时跑一次，每次发 1 封（MAIL_LIMIT=1）。
-# 跨运行间隔 2 小时 ≫ 10 分钟，QQ 不会判 spam，wait_interval 也不会阻塞。
-# 境外 runner 用 --link-only：跳过附件下载（网关下不动），带附件项目正文发政务网网关直链（境内可打开）。
+# 手动触发才跑（`MAIL_LIMIT` 控制每次几封，默认 1）。
+# 境外 runner 用 --link-only：跳过附件下载（网关下不动），带附件项目正文发
+# 政务网网关直链（境内可打开）+ OSS 直链（境外可下），两条都从 CSV 查表得来。
+# 跨运行建议间隔 ≥ 10 分钟，避免 QQ 判 spam。
 # SMTP 凭证全部走 GitHub Secrets，仓库里只有 .env.example 模板。
 
+# ⚠️ 定时发送已停用（2026-10-15）。
+# 原因：附件本体已经改走「境内云函数解析 OSS 直链 → Actions → Google Drive」
+#      （tools/to_drive.py + drive.yml），邮件不再是拿到附件的必经路径。
+# 想恢复定时：把下面两行注掉的代码加回来即可；临时补发/看历史项目手动 Run workflow。
 on:
-  schedule:
-    - cron: '0 */2 * * *'
+  # schedule:
+  #   - cron: '0 */2 * * *'
   workflow_dispatch:
 
 permissions:
