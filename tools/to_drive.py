@@ -144,14 +144,20 @@ def rclone_copyurl(url, dest):
     return False, (tail[-1] if tail else f"rclone exit {p.returncode}")[:200]
 
 
-def probe_drive(base):
-    """同步前探活：确认 SA 看得见、且写得进那个共享文件夹。
+def rclone_delete(path):
+    subprocess.run(["rclone", "deletefile", path],
+                   capture_output=True, text=True, timeout=120)
 
-    2026-10-15 首个 drive 运行 101 个文件全部死在同一步：
-    「failed to make directory: googleapi: Error 404: File not found」。
-    404（而非 401）说明 SA 密钥本身是好的，是共享文件夹对它不可见——
-    典型的没分享 / 分享错邮箱 / 文件夹在共享云端硬盘里。这里提前炸掉，
-    省得每个文件重演一遍（那次白跑了 552 秒）。
+
+def probe_drive(base, rows):
+    """同步前探活：确认凭证看得见、写得进共享文件夹，且有存储配额。
+
+    两次实测踩坑（都在 2026-10-15）：
+    1. 101 个文件全部死在「failed to make directory: 404」——SA 看不到文件夹；
+    2. 分享修好后 101 个文件全部死在「Service Accounts do not have storage
+       quota」403——SA 配额为 0，往「我的云端硬盘」传文件一律被拒。
+    mkdir 只建文件夹、不占存储，两个坑都探不出来；所以最后用最小的待传文件
+    真传一次。两种失败都不再让 101 个文件挨个重演。
     """
     log("检查 Drive 访问（about + mkdir 探活）…")
     p = subprocess.run(["rclone", "about", REMOTE], capture_output=True, text=True, timeout=120)
@@ -163,23 +169,51 @@ def probe_drive(base):
         log("  （about 查不到账号信息，忽略，继续 mkdir 探活）")
     q = subprocess.run(["rclone", "mkdir", f"{REMOTE}{sanitize(base)}"],
                        capture_output=True, text=True, timeout=120)
-    if q.returncode == 0:
-        log(f"✓ 共享文件夹可写（顶层目录 {base} 已就绪）")
+    if q.returncode != 0:
+        tail = ((q.stderr or "") + (q.stdout or "")).strip().splitlines()
+        errs = [l for l in tail if " ERROR " in l or " CRITICAL " in l or "Failed" in l]
+        log("✗ 在共享文件夹里建目录失败——凭证访问不到它：")
+        for line in (errs or tail)[-3:]:
+            log(f"    {line}")
+        log("排查（按命中率排序）：")
+        log("  1. 文件夹没分享给 SA：Drive 网页打开该文件夹 → 分享 → 添加 SA 邮箱")
+        log("     → 权限选「编辑者」。注意：只分享父文件夹不够，要分享到用的这一层。")
+        log("  2. 分享错了邮箱：SA 邮箱以 workflow 日志里「SA 邮箱」那行为准，")
+        log("     逐字符对比分享时填的地址。")
+        log("  3. 文件夹在「共享云端硬盘」里：必须把 SA 加为该磁盘成员，")
+        log("     只分享其中的子文件夹，SA 访问照样是 404。")
+        log("  4. DRIVE_FOLDER_ID 填错：secrets 里的 ID 应与文件夹 URL 末段一致。")
+        return False
+    log(f"✓ 共享文件夹可写（顶层目录 {base} 已就绪）")
+
+    if not rows:
         return True
-    tail = ((q.stderr or "") + (q.stdout or "")).strip().splitlines()
-    errs = [l for l in tail if " ERROR " in l or " CRITICAL " in l or "Failed" in l]
-    log("✗ 在共享文件夹里建目录失败——Service Account 访问不到它：")
-    for line in (errs or tail)[-3:]:
-        log(f"    {line}")
-    log("排查（按命中率排序）：")
-    log("  1. 文件夹没分享给 SA：Drive 网页打开该文件夹 → 分享 → 添加 SA 邮箱")
-    log("     → 权限选「编辑者」。注意：只分享父文件夹不够，要分享到用的这一层。")
-    log("  2. 分享错了邮箱：SA 邮箱以 workflow 日志里「打印 SA 邮箱」那步为准，")
-    log("     逐字符对比分享时填的地址。")
-    log("  3. 文件夹在「共享云端硬盘」里：必须把 SA 加为该磁盘成员，")
-    log("     只分享其中的子文件夹，SA 访问照样是 404。")
-    log("  4. DRIVE_FOLDER_ID 填错：secrets 里的 ID 应与文件夹 URL 末段一致。")
-    return False
+    r = min(rows, key=lambda x: x["size"] or (1 << 40))
+    probe = f"{REMOTE}{sanitize(base)}/.probe/{sanitize(r['filename'], 120)}"
+    log(f"试传最小的附件（{human(r['size'])}）验证存储配额…")
+    good, err = rclone_copyurl(r["oss"], probe)
+    if good:
+        rclone_delete(probe)
+        subprocess.run(["rclone", "rmdir", f"{REMOTE}{sanitize(base)}/.probe"],
+                       capture_output=True, text=True, timeout=60)
+        log("✓ 试传成功，配额正常")
+        return True
+    if "storage quota" in err or "shared drives" in err.lower():
+        log("✗ 试传被拒：Service Account 没有存储配额")
+        log(f"    {err}")
+        log("原因：SA 的存储配额是 0，往「我的云端硬盘」里的文件夹传文件会被")
+        log("      Google 一律拒绝（403）；建文件夹不占存储，所以上面那步是过的。")
+        log("出路二选一：")
+        log("  A. 共享云端硬盘（需 Google Workspace 付费账号）：")
+        log("     新建共享云端硬盘 → 把 SA 邮箱加为成员（内容管理员）→")
+        log("     用磁盘里的文件夹 ID 更新 secrets.DRIVE_FOLDER_ID → 重跑。")
+        log("  B. OAuth 用户授权（免费个人账号可用，文件占用户本人 15GB 配额）：")
+        log("     自己电脑跑 rclone authorize \"drive\"，浏览器登录后把输出的")
+        log("     token JSON 存为 secrets.GDRIVE_TOKEN，workflow 会自动切模式。")
+        return False
+    log("⚠ 试传失败但不像配额问题（可能只是这条 OSS 直链失效），继续正式同步：")
+    log(f"    {err}")
+    return True
 
 
 def main():
@@ -222,7 +256,7 @@ def main():
     if subprocess.run(["rclone", "version"], capture_output=True).returncode != 0:
         sys.exit("rclone 不可用。Actions 里先装：curl https://rclone.org/install.sh | sudo bash")
 
-    if not probe_drive(args.base):
+    if not probe_drive(args.base, pending):
         return 1
 
     ok_n = fail_n = 0
