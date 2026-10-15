@@ -148,7 +148,10 @@ files/               ← gitignore（下载的附件本体）
             文件夹若在「共享云端硬盘」里，须把 SA 加为磁盘成员。代码侧已加
             `probe_drive` 探活：访问不通就 10 秒内带排查清单退出，不再空跑 10 分钟；
             回写步骤也改成先 `pull --rebase` 再推（首跑因并发提交被拒丢过状态）。
-            修好分享后手动触发 drive.yml 即可，state 会断点续跑
+            分享修好后仍会撞第二堵墙：`Service Accounts do not have storage
+            quota` 403——SA 配额为 0，只能传共享云端硬盘。免费个人账号走
+            OAuth 用户授权（`GDRIVE_TOKEN` secret，workflow 自动切模式），
+            详见 docs/04。修好后手动触发 drive.yml，state 会断点续跑
 - [x] **直链解析自动化（不用再手动 resolve）**：`cloud/main.py` 在采集时顺带把新附件的
       网关地址 302/301 解析成 OSS 直链（`resolve: true` / `max_resolve: 40`，串行+0.4s 间隔防限流），
       随 `links[]` 返回；新增 `POST /resolve` 端点给 Actions 重试失败条目。
