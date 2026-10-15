@@ -61,7 +61,10 @@ import requests
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ITEMS = os.path.join(ROOT, "data", "items.json")
 STATE = os.path.join(ROOT, "data", "mail_state.json")
-LINK_CACHE = os.path.join(ROOT, "files", "direct_links.csv")
+# 直链映射：优先仓库内 data/oss_links.csv（跟着 git 走，Actions 也能读）；
+# files/direct_links.csv 是境内 download.py --resolve 的本地产出，作为补充合并。
+LINK_CACHE = os.path.join(ROOT, "data", "oss_links.csv")
+LINK_CACHE_LOCAL = os.path.join(ROOT, "files", "direct_links.csv")
 WORKDIR = os.path.join(ROOT, "files", "mail")
 
 CST = timezone(timedelta(hours=8))
@@ -217,19 +220,23 @@ def load_projects(args):
 
 
 def load_cache():
-    """files/direct_links.csv 是 网关URL → OSS直链+大小 的现成缓存，省掉重复的 302/301"""
+    """网关URL → (OSS直链, 大小) 的映射。两个来源都合并：
+    data/oss_links.csv 入库随 git 走（Actions 可读），
+    files/direct_links.csv 是境内 resolve 的本地产出（后者覆盖前者）"""
     cache = {}
-    if not os.path.exists(LINK_CACHE):
-        return cache
-    try:
-        with open(LINK_CACHE, encoding="utf-8-sig") as f:
-            for row in csv.DictReader(f):
-                g = (row.get("网关地址") or "").strip()
-                if g:
-                    cache[g] = ((row.get("OSS直链") or "").strip(),
-                                parse_size(row.get("大小") or ""))
-    except Exception:
-        pass
+    for path in (LINK_CACHE, LINK_CACHE_LOCAL):
+        if not os.path.exists(path):
+            continue
+        try:
+            with open(path, encoding="utf-8-sig") as f:
+                for row in csv.DictReader(f):
+                    g = (row.get("网关地址") or "").strip()
+                    oss = (row.get("OSS直链") or "").strip()
+                    # 只收真直链：解析失败的行 OSS直链 列会退回网关 URL，不能当缓存
+                    if g and oss.startswith("http") and "hbj.huzhou.gov.cn" not in oss:
+                        cache[g] = (oss, parse_size(row.get("大小") or ""))
+        except Exception:
+            pass
     return cache
 
 
@@ -474,14 +481,16 @@ def build_mail(rec, cfg, zippath=None, backup=None):
     elif rec["atts"]:
         lis = []
         for a in rec["atts"]:
-            link = a.get("oss") or a["url"]
+            oss, gw = a.get("oss"), a["url"]
+            size = f' · {human(a.get("size"))}' if a.get("size") else ""
+            links = f'<a href="{gw}">政务网网关</a>'
+            if oss:
+                links += f'　｜　<a href="{oss}">OSS 直链（境外可下）</a>'
             extra = ""
             if backup and backup.get(a["url"]):
                 extra = f'　｜　<a href="{backup[a["url"]]}">COS 备份</a>'
-            lis.append(f'<li>{a["filename"]}'
-                       + (f' · {human(a.get("size"))}' if a.get("size") else "")
-                       + f'　→　<a href="{link}">政务网直链</a>{extra}</li>')
-        att_html = ('<p style="margin:14px 0 4px"><b>附件</b>（请以下方链接下载）：</p>'
+            lis.append(f'<li>{a["filename"]}{size}　→　{links}{extra}</li>')
+        att_html = ('<p style="margin:14px 0 4px"><b>附件</b>（请从下方链接下载）：</p>'
                     '<ul>' + "".join(lis) + "</ul>")
     else:
         att_html = '<p style="margin:14px 0 4px">该公告未提供附件下载。</p>'
@@ -512,7 +521,9 @@ def build_mail(rec, cfg, zippath=None, backup=None):
         plain += "\n附件：" + "、".join(a["filename"] for a in rec["atts"]) + "（见邮件附件）"
     else:
         for a in rec["atts"]:
-            plain += f"\n附件：{a['filename']} {a.get('oss') or a['url']}"
+            plain += f"\n附件：{a['filename']} {a['url']}"
+            if a.get("oss"):
+                plain += f"\n　OSS 直链：{a['oss']}"
             if backup and backup.get(a["url"]):
                 plain += f"\n　备份：{backup[a['url']]}"
 
@@ -687,9 +698,21 @@ def main():
     # 默认只发链接（带附件项目正文给政务网直链），不下载附件本体；
     # 只有显式 --attach 才允许把小附件打包进邮件。--link-only 是默认值别名，保留兼容。
     if args.link_only or not args.attach:
+        # 链接模式不下载附件，但用仓库里的直链映射（data/oss_links.csv）查表，
+        # 把 OSS 直链和体积填进 atts——纯本地查表，境外 Actions 上也安全。
+        cache = load_cache()
+        n_oss = n_att_all = 0
         for r in records:
+            for a in r["atts"]:
+                n_att_all += 1
+                hit = cache.get(a["url"])
+                if hit:
+                    a["oss"], a["size"] = hit
+                    n_oss += 1
+            r["total"] = sum(a.get("size") or 0 for a in r["atts"])
             r["mode"] = "info" if not r["atts"] else "link"
-        log("链接模式：跳过附件解析与下载（带附件项目正文发政务网直链）")
+        log(f"链接模式：跳过附件下载；{n_oss}/{n_att_all} 个附件查到 OSS 直链"
+            f"（其余只发网关链接）")
     else:
         log("解析附件直链与体积…")
         resolve_all(records, load_cache())
