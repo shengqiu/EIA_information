@@ -41,9 +41,9 @@
 ④ example.com         code=200 耗时=0.04s     ← 出口本身正常
 ```
 
-推论：**只要手里有 OSS 直链，境外就能下附件**。而直链只能靠跟随网关的 302/301 拿到，
-所以正确做法是让**境内云函数在采集时顺手把 `oss_url` / `oss_size` 解析出来一起返回**，
-境外拿着直链就能直接下载，不必再碰网关。（待办里已记这条改进。）
+推论：**只要手里有 OSS 直链，境外就能下附件**。直链靠跟随网关的 302/301 拿到（必须境内），
+已落地为 `data/oss_links.csv` 映射入库（境内 `download.py --resolve` 更新，注意 `--workers 1`
+防网关限流），mailer 的 link 模式查表后邮件里同时给网关链接 + OSS 直链。
 
 所以现在的分工是：**采集在国内跑 → 把结果推到 GitHub → GitHub Pages 只负责发布**。
 `pages.yml` 里有一道保险丝：看板数据为 0 条时**拒绝发布**，防止再次被空数据覆盖。
@@ -74,7 +74,7 @@
 python3 monitor.py                 # ~30 秒，写 data/items.json + data/state.json + reports/index.html
 python3 tools/download.py --dry-run          # 看看有哪些附件、多大
 python3 tools/download.py --unit 南浔分局     # 按单位下载
-python3 tools/download.py --resolve          # 解析全部附件的 OSS 直链 → files/direct_links.csv
+python3 tools/download.py --resolve          # 解析全部附件的 OSS 直链 → files/ + data/oss_links.csv
 ```
 
 ## 目录
@@ -120,10 +120,13 @@ files/               ← gitignore（下载的附件本体）
 - [x] **按项目发邮件（链接模式）已上 Actions**：`tools/mailer.py` + `.github/workflows/mail.yml`
       （每 2 小时跑 1 次、每次 1 封、`--link-only`），SMTP 凭证在 GitHub Secrets，
       `data/mail_state.json` 跨运行回写续传。端到端实测通过（已发 5 封）
-- [ ] **发真正带附件的邮件**：需境内执行（本沙箱/用户机器 `--mail`），或让云函数返回
-      OSS 直链后改 mailer 从 OSS 下载（境外可下，见下条待办）
-- [ ] **云函数顺手解析 OSS 直链**：让 `cloud/main.py` 在采集时就解析出
-      `项目[].附件链接` 对应的 `oss_url`/`oss_size` 一起返回，
-      这样境外（Actions）拿到数据就能直接下附件，不必再碰被挡的网关
-- [ ] `files/direct_links.csv` 是否纳入仓库（81 条 OSS 直链，配合 `aria2 -i` 可整包拉 1 GB）
+- [x] **邮件附件区带 OSS 直链**：`data/oss_links.csv`（`网关URL → OSS直链` 映射，81/87 覆盖）
+      已入库，mailer link 模式纯查表填充，Actions 上也能给出境外可下的直链。
+      更新方式：境内 `python3 tools/download.py --resolve --workers 1`（并发高会触发网关限流）
+- [ ] **发真正带附件的邮件**：仍需境内执行（`--attach`，本沙箱/用户机器）。
+      理论上也可让 mailer 从 OSS 直链下载后 attach（境外实测可下），未实现
+- [ ] 补齐 `data/oss_links.csv` 剩余 6 个未覆盖附件（网关链接过期或解析失败）
+- [ ] 决定 Cloudflare Worker 的去留（现在是个只能读 KV 的空壳）
+- [x] `data/oss_links.csv` 已纳入仓库（81 条 OSS 直链映射，mailer 直接用；
+      配合 `aria2` 可按直链整包拉附件）
 - [ ] 换 fine-grained token：现在用的是 classic PAT（repo+workflow），权限过大，且明文写在 git remote 里
