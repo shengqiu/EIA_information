@@ -250,22 +250,51 @@ SCRAPE_URL=http://127.0.0.1:8899/scrape SCRAPE_TOKEN=test \
 
 ## 接口
 
-**POST** `?token=<SCRAPE_TOKEN>` → body 见下
+**POST** `?token=<SCRAPE_TOKEN>` → 采集 +（默认）顺带解析新附件的 OSS 直链
 
 ```jsonc
 // 请求
-{"seen": {"<art_id>": "2026-09-29 17:19"}, "limit": 12, "max_new": 60}
+{"seen": {"<art_id>": "2026-09-29 17:19"}, "limit": 12, "max_new": 60,
+ "resolve": true,      // 是否解析新公告附件的 OSS 直链，默认 true
+ "max_resolve": 40}    // 单次最多解析几个附件（串行，防超时）
 
 // 响应
 {"ok": true,
  "new": [ /* 本次新解析的公告对象 */ ],
+ "links": [           // 附件直链，CSV 行格式，可直接合并进 data/oss_links.csv
+   {"公告日期": "2026-10-15", "发布单位": "南浔分局", "项目名称": "...",
+    "建设单位": "...", "文件名": "...全本.zip", "大小": "32.1MB",
+    "OSS直链": "https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.../xxx.zip?fileName=...",
+    "网关地址": "https://hbj.huzhou.gov.cn/api-gateway/...download?fileUrl=..."}
+ ],
+ "attachments": 12,     // 本次新公告带了多少个附件
+ "resolved": 11,        // 其中解析出真直链几个
  "seen": { /* 更新后的 id 名单，原样存回 data/state.json */ },
- "scanned": 192,        // 列表层扫到多少条
- "parsed": 3,           // 本次解析成功几条
- "failed": 0,
- "columns_ok": 16,      // 16 个栏目成功几个
- "columns_failed": 0,
+ "scanned": 192, "parsed": 3, "failed": 0,
+ "columns_ok": 16, "columns_failed": 0,
  "elapsed_sec": 21.4}
 ```
 
 **GET** → 探活，返回 `{"ok":true,"columns":16,"auth":true}`
+
+**POST** `/resolve` → 单独批量解析网关地址，用来重试之前失败的条目
+
+```jsonc
+// 请求
+{"urls": ["https://hbj.huzhou.gov.cn/api-gateway/...download?fileUrl=...", "..."]}
+
+// 响应：只返回解析成功的；解析不了的不返回
+{"ok": true,
+ "links": [{"网关地址": "...", "OSS直链": "...", "大小": "32.1MB", "文件名": "..."}],
+ "done": 3, "failed": 1, "elapsed_sec": 4.2}
+```
+
+### 为什么直链解析必须放在云函数
+
+网关 `download?fileUrl=<密文>` **只有境内 IP 才肯** 302 → 301 跳到浙江政务云 OSS；
+而 OSS 直链本身无签名、境外可达。所以分工是：**境内解析（云函数），境外使用（Actions）**。
+解析走 Range `bytes=0-0`，只要 1 字节头信息，不下内容；串行 + 间隔 0.4 秒，
+否则网关会限流（本地实测并发 6 → 成功率掉到 10%，串行 → 70%+）。
+
+有些附件的网关链指向 `cms.zjzwfw.gov.cn`（浙江政务外网专用域名，公共 DNS 返回
+10.x 私网地址），公网无解 —— 这类 `OSS直链` 会留空，下游脚本自动跳过。
