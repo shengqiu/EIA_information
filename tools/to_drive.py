@@ -144,6 +144,44 @@ def rclone_copyurl(url, dest):
     return False, (tail[-1] if tail else f"rclone exit {p.returncode}")[:200]
 
 
+def probe_drive(base):
+    """同步前探活：确认 SA 看得见、且写得进那个共享文件夹。
+
+    2026-10-15 首个 drive 运行 101 个文件全部死在同一步：
+    「failed to make directory: googleapi: Error 404: File not found」。
+    404（而非 401）说明 SA 密钥本身是好的，是共享文件夹对它不可见——
+    典型的没分享 / 分享错邮箱 / 文件夹在共享云端硬盘里。这里提前炸掉，
+    省得每个文件重演一遍（那次白跑了 552 秒）。
+    """
+    log("检查 Drive 访问（about + mkdir 探活）…")
+    p = subprocess.run(["rclone", "about", REMOTE], capture_output=True, text=True, timeout=120)
+    if p.returncode == 0:
+        for line in (p.stdout or "").splitlines():
+            if ":" in line:
+                log(f"  {line.strip()}")
+    else:
+        log("  （about 查不到账号信息，忽略，继续 mkdir 探活）")
+    q = subprocess.run(["rclone", "mkdir", f"{REMOTE}{sanitize(base)}"],
+                       capture_output=True, text=True, timeout=120)
+    if q.returncode == 0:
+        log(f"✓ 共享文件夹可写（顶层目录 {base} 已就绪）")
+        return True
+    tail = ((q.stderr or "") + (q.stdout or "")).strip().splitlines()
+    errs = [l for l in tail if " ERROR " in l or " CRITICAL " in l or "Failed" in l]
+    log("✗ 在共享文件夹里建目录失败——Service Account 访问不到它：")
+    for line in (errs or tail)[-3:]:
+        log(f"    {line}")
+    log("排查（按命中率排序）：")
+    log("  1. 文件夹没分享给 SA：Drive 网页打开该文件夹 → 分享 → 添加 SA 邮箱")
+    log("     → 权限选「编辑者」。注意：只分享父文件夹不够，要分享到用的这一层。")
+    log("  2. 分享错了邮箱：SA 邮箱以 workflow 日志里「打印 SA 邮箱」那步为准，")
+    log("     逐字符对比分享时填的地址。")
+    log("  3. 文件夹在「共享云端硬盘」里：必须把 SA 加为该磁盘成员，")
+    log("     只分享其中的子文件夹，SA 访问照样是 404。")
+    log("  4. DRIVE_FOLDER_ID 填错：secrets 里的 ID 应与文件夹 URL 末段一致。")
+    return False
+
+
 def main():
     ap = argparse.ArgumentParser(description="把 oss_links.csv 里的附件同步到 Google Drive")
     ap.add_argument("--base", default="环评附件", help="Drive 上的顶层文件夹名")
@@ -183,6 +221,9 @@ def main():
 
     if subprocess.run(["rclone", "version"], capture_output=True).returncode != 0:
         sys.exit("rclone 不可用。Actions 里先装：curl https://rclone.org/install.sh | sudo bash")
+
+    if not probe_drive(args.base):
+        return 1
 
     ok_n = fail_n = 0
     bytes_n = 0
