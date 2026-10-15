@@ -215,17 +215,35 @@ def main():
 
 
 def do_resolve_missing(resolve_url, args):
-    """把 CSV 里还没解析出直链的附件丢给云函数重试。
-    日常就几条（政务外网专用域名那种永远失败，重试失败也算有交代）。"""
+    """把缺直链的附件丢给云函数重试。补两类漏网：
+    1) CSV 里有行但没直链的（比如指向政务外网专用域名的，重试也是失败，至少留个交代）
+    2) items.json 里有附件、但压根没进 CSV 的 —— 半路升级新功能前的历史遗留，
+       这类不主动捞一次就永远进不了 Google Drive。
+    """
     rows = load_csv_rows()
+    have = {r.get("网关地址", "").strip() for r in rows if r.get("网关地址")}
     missing = [r["网关地址"] for r in rows
                if r.get("网关地址") and not real_oss(r.get("OSS直链", ""))]
-    if not missing:
+
+    extra = {}          # 网关地址 → items.json 里的项目信息
+    items = load_json(ITEMS_PATH, [])
+    for it in items:
+        for p in it.get("项目") or []:
+            for u in p.get("附件链接") or []:
+                if u and u not in have and u not in extra:
+                    extra[u] = {"公告日期": it.get("发布日期") or "",
+                                "发布单位": it.get("unit") or "",
+                                "项目名称": p.get("项目名称") or "",
+                                "建设单位": p.get("建设单位") or ""}
+
+    urls = missing + list(extra)
+    if not urls:
         print("没有缺直链的条目，跳过")
         return 0
-    print(f"缺直链 {len(missing)} 条 → 交给云函数重试（{resolve_url.split('?')[0]}）")
+    print(f"待补 {len(urls)} 条（CSV 缺直链 {len(missing)} + 新发现未入库 {len(extra)}）"
+          f" → {resolve_url.split('?')[0]}")
     try:
-        r = requests.post(resolve_url, json={"urls": missing}, timeout=args.timeout)
+        r = requests.post(resolve_url, json={"urls": urls}, timeout=args.timeout)
     except Exception as e:
         print(f"[warn] 调用失败：{e!r}")
         return 1
@@ -239,13 +257,22 @@ def do_resolve_missing(resolve_url, args):
         print(f"[warn] 响应不是 JSON：{r.text[:200]}")
         return 1
 
-    added, updated = upsert_links(rows, out.get("links") or [])
+    # 新入库的那些（原本没有 CSV 行的）要把项目信息从 items.json 补上
+    links = out.get("links") or []
+    for l in links:
+        meta = extra.get((l.get("网关地址") or "").strip())
+        if meta:
+            for k, v in meta.items():
+                if v and not (l.get(k) or "").strip():
+                    l[k] = v
+
+    added, updated = upsert_links(rows, links)
     if added or updated:
         write_csv(rows)
-    left = len(missing) - len(out.get("links") or [])
-    print(f"✅ 补回 {len(out.get('links') or [])} 条（新增 {added} 更新 {updated}），"
+    left = len(urls) - len(links)
+    print(f"✅ 补回 {len(links)} 条（新增 {added} 更新 {updated}），"
           f"仍缺 {left} 条；耗时 {out.get('elapsed_sec')}s")
-    print(f"::notice::补回直链 {len(out.get('links') or [])} 条 / 仍缺 {left} 条")
+    print(f"::notice::补回直链 {len(links)} 条 / 仍缺 {left} 条")
     return 0
 
 
