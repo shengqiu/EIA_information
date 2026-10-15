@@ -124,7 +124,10 @@ files/               ← gitignore（下载的附件本体）
       `data/mail_state.json` 跨运行回写续传。端到端实测通过（已发 5 封）
 - [x] **邮件附件区带 OSS 直链**：`data/oss_links.csv`（`网关URL → OSS直链` 映射，81/87 覆盖）
       已入库，mailer link 模式纯查表填充，Actions 上也能给出境外可下的直链。
-      更新方式：境内 `python3 tools/download.py --resolve --workers 1`（并发高会触发网关限流）
+      更新方式：**全自动**——每日 `daily.yml` 调境内云函数时顺带把新附件的网关地址
+      解析成直链（`resolve`/`max_resolve` 控制），`fetch_remote.py` 合并进 CSV；
+      失败条目由 `--resolve-missing` 每天重试。手动重跑应急：
+      `python3 tools/download.py --resolve --workers 1`（并发高会触发网关限流）
 - [ ] **发真正带附件的邮件**：仍需境内执行（`--attach`，本沙箱/用户机器）。
       理论上也可让 mailer 从 OSS 直链下载后 attach（境外实测可下），未实现
 - [ ] 补齐 `data/oss_links.csv` 剩余 6 个未覆盖附件（网关链接过期或解析失败）
@@ -138,3 +141,11 @@ files/               ← gitignore（下载的附件本体）
       凭证只走 Secrets（`GDRIVE_SA_JSON` / `DRIVE_FOLDER_ID`）
       - [ ] **待用户完成 Google 端一次性配置**（建 SA、建共享文件夹、加 2 个 secret）
             后手动触发首跑；配置步骤见 `docs/04-附件下载.md`
+- [x] **直链解析自动化（不用再手动 resolve）**：`cloud/main.py` 在采集时顺带把新附件的
+      网关地址 302/301 解析成 OSS 直链（`resolve: true` / `max_resolve: 40`，串行+0.4s 间隔防限流），
+      随 `links[]` 返回；新增 `POST /resolve` 端点给 Actions 重试失败条目。
+      `tools/fetch_remote.py` 按「网关地址」合并进 `data/oss_links.csv`（幂等，已测重跑 0 变更）。
+      **需要用户重新部署云函数后生效：`python3 cloud/deploy_tc.py --region ap-shanghai --token <hex>`**
+      ——在此之前 daily.yml 仍能跑（旧版函数忽略新参数，只是不返回 links）
+- [x] **附件直达 Google Drive，不再经过邮件**：`daily.yml`（含文件解析）→ `workflow_run`
+      触发 `drive.yml` → `to_drive.py` 沿 OSS 直链 rclone 上传。附件本体一条邮件都不用发
