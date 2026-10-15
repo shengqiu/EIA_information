@@ -232,8 +232,13 @@ def load_cache():
                 for row in csv.DictReader(f):
                     g = (row.get("网关地址") or "").strip()
                     oss = (row.get("OSS直链") or "").strip()
-                    # 只收真直链：解析失败的行 OSS直链 列会退回网关 URL，不能当缓存
-                    if g and oss.startswith("http") and "hbj.huzhou.gov.cn" not in oss:
+                    # 只收真直链：解析失败的行 OSS直链 列会退回网关 URL，不能当缓存。
+                    # 政务外网专用域名（cms.zjzwfw.gov.cn，A 记录是 10.x 私网地址）也会
+                    # 以 http 开头且不含 hbj.huzhou.gov.cn，必须按 fileUrl= 特征排除。
+                    if (g and oss.startswith("http")
+                            and "hbj.huzhou.gov.cn" not in oss
+                            and "fileUrl=" not in oss
+                            and "/api-gateway/" not in oss):
                         cache[g] = (oss, parse_size(row.get("大小") or ""))
         except Exception:
             pass
