@@ -301,10 +301,31 @@ def save_state(st):
 
 # ---------------------------------------------------------------- 解压
 
+def clip_bytes(name, max_bytes=200):
+    """按 UTF-8 字节数截断，防超 Linux 单文件名 255 字节上限。
+
+    2026-10-16 实测：一个解压文件名 255 字节整，open() 直接
+    Errno 36（GitHub runner 同症状）。中文 3 字节/字符，按字符数
+    截断（旧代码 sanitize(...,120)）根本拦不住。
+    """
+    b = name.encode("utf-8")
+    if len(b) <= max_bytes:
+        return name
+    stem, dot, ext = name.rpartition(".")
+    if not dot or not ext:
+        stem, ext = name, ""
+    ext_part = ("." + ext) if ext else ""
+    room = max_bytes - len(ext_part.encode("utf-8"))
+    if room <= 0:
+        return b[:max_bytes].decode("utf-8", "ignore")
+    head = stem.encode("utf-8")[:room].decode("utf-8", "ignore")
+    return (head + ext_part) or "未命名"
+
+
 def safe_inner(name):
     """压缩包内文件名 → 扁平安全名：只留最后一段，防目录穿越。"""
     base = name.replace("\\", "/").rsplit("/", 1)[-1]
-    return sanitize(base, 120)
+    return clip_bytes(sanitize(base, 120))
 
 
 def dedupe(name, used):
@@ -322,25 +343,48 @@ def dedupe(name, used):
     return mk(n)
 
 
-def extract_zip(path, dest):
-    """zipfile 解压 + GBK 文件名还原。返回 [(安全名, 字节数), ...]。
+def decode_zip_name(info):
+    """zip 内文件名 → 正确中文名。
 
-    政务网压缩包是 Windows 打包的：没打 UTF-8 标志位（flag_bits & 0x800）
-    时文件名是 GBK，Python 默认按 cp437 解，出来是 ║■╓▌ 这类乱码，
-    要 cp437→gbk 转回来（已用真实附件实测）。
+    政务网压缩包来源五花八门：多数是 Windows 打包的 GBK 且没打
+    UTF-8 标志位（flag_bits & 0x800），Python 默认按 cp437 解出乱码，
+    要 cp437→gbk 转回来；但也有的明明是 UTF-8 却忘了打标志位——
+    2026-10-16 实测金洁的 zip 就是这种：gbk 还原报 illegal
+    multibyte，按 UTF-8 解才对。打了标志位的 zipfile 自己会按
+    utf-8 解，直接用。依次试 gbk → gb18030 → utf-8。
+    """
+    name = info.filename
+    if info.flag_bits & 0x800:
+        return name
+    try:
+        raw = name.encode("cp437")     # cp437 字符还原成原始字节
+    except UnicodeEncodeError:
+        return name
+    for enc in ("gbk", "gb18030", "utf-8"):
+        try:
+            return raw.decode(enc)
+        except UnicodeDecodeError:
+            continue
+    return name
+
+
+def extract_zip(path, dest):
+    """zipfile 解压 + 中文文件名还原。返回 [(安全名, 字节数), ...]。
+
+    政务网压缩包是 Windows/macOS 打包的：没打 UTF-8 标志位时文件名
+    是 GBK，Python 默认按 cp437 解，出来是 ║■╓▌ 这类乱码，
+    按 flag_bits 判断还原（见 decode_zip_name，已用真实附件实测）。
+    macOS 打包的 __MACOSX/._* AppleDouble 元数据不是文档，跳过。
     """
     out, used = [], set()
     with zipfile.ZipFile(path) as z:
         for info in z.infolist():
             if info.is_dir():
                 continue
-            name = info.filename
-            if not (info.flag_bits & 0x800):
-                try:
-                    name = name.encode("cp437").decode("gbk")
-                except (UnicodeEncodeError, UnicodeDecodeError):
-                    pass
-            name = dedupe(safe_inner(name), used)
+            if info.filename.startswith("__MACOSX/") \
+                    or os.path.basename(info.filename).startswith("._"):
+                continue
+            name = dedupe(safe_inner(decode_zip_name(info)), used)
             used.add(name)
             target = os.path.join(dest, name)
             os.makedirs(dest, exist_ok=True)
@@ -351,7 +395,14 @@ def extract_zip(path, dest):
 
 
 def extract_bsdtar(path, dest):
-    """rar/7z 等交给 bsdtar（libarchive）。返回解出的安全名列表。"""
+    """rar/7z 等交给 bsdtar（libarchive）。返回扁平化后的 [(安全名, 字节数), ...]。
+
+    2026-10-16 实测坑：有的 rar 把文件裹在同名子目录里（X/X.pdf），
+    bsdtar 原样落盘；旧代码只报告 basename、不把文件搬到 dest 根下，
+    于是 do_archive 拿 work/<basename> 当 rclone 源——文件不存在，
+    rclone 把不存在的源当目录，报 `Failed to copy: directory not found`。
+    所以解压完统一拍平到 dest 根下（顺带治子目录名超长）。
+    """
     def snapshot():
         return {os.path.relpath(os.path.join(r, f), dest)
                 for r, _, fs in os.walk(dest) for f in fs}
@@ -371,7 +422,13 @@ def extract_bsdtar(path, dest):
             continue
         name = dedupe(safe_inner(rel), used)
         used.add(name)
-        out.append((name, os.path.getsize(full)))
+        flat = os.path.join(dest, name)
+        if os.path.abspath(full) != os.path.abspath(flat):
+            shutil.move(full, flat)      # 拍平：子目录里的文件提到 dest 根下
+        out.append((name, os.path.getsize(flat)))
+    for r, dirs, _ in os.walk(dest, topdown=False):   # 清掉空目录层级
+        if r != dest and not os.listdir(r):
+            os.rmdir(r)
     return out
 
 
@@ -393,6 +450,32 @@ def download(url, path, tries=3):
 
 # ---------------------------------------------------------------- rclone
 
+def _run_rclone(cmd, timeout, tries=2, backoff=5, input_text=None):
+    """跑 rclone；瞬时失败自动重试一次。
+
+    2026-10-16 实测：Google 上传 API 会抖（品善.pdf 的 copyurl
+    "Post .../upload/drive/v3/files" 连错 2 次），Drive 目录元数据
+    也有短暂滞后。rclone 自带 --retries/--low-level-retries 之外，
+    这里再包一层进程级重试，两次都挂才记失败。
+    """
+    last = ""
+    for i in range(tries):
+        try:
+            p = subprocess.run(cmd, capture_output=True, text=True,
+                               input=input_text, encoding="utf-8",
+                               timeout=timeout)
+        except subprocess.TimeoutExpired:
+            last = f"超时（>{timeout // 60}min）"
+        else:
+            if p.returncode == 0:
+                return True, ""
+            tail = (p.stderr or p.stdout or "").strip().splitlines()
+            last = (tail[-1] if tail else f"rclone exit {p.returncode}")[:200]
+        if i + 1 < tries:
+            time.sleep(backoff * (i + 1))
+    return False, last
+
+
 def rclone_copyurl(url, dest):
     """流式上传：OSS 直链 → Drive。返回 (ok, 错误信息)。"""
     cmd = [
@@ -403,36 +486,21 @@ def rclone_copyurl(url, dest):
         "--stats", "15s",
         "--stats-one-line",
     ]
-    try:
-        p = subprocess.run(cmd, capture_output=True, text=True, timeout=3600)
-    except subprocess.TimeoutExpired:
-        return False, "超时（>1h）"
-    if p.returncode == 0:
-        return True, ""
-    tail = (p.stderr or p.stdout or "").strip().splitlines()
-    return False, (tail[-1] if tail else f"rclone exit {p.returncode}")[:200]
+    return _run_rclone(cmd, 3600)
 
 
 def rclone_copy(local, folder):
     """本地文件 → Drive 文件夹（落在 folder/< basename >）。"""
-    p = subprocess.run(["rclone", "copy", local, folder,
-                        "--retries", "3", "--stats", "15s", "--stats-one-line"],
-                       capture_output=True, text=True, timeout=3600)
-    if p.returncode == 0:
-        return True, ""
-    tail = (p.stderr or p.stdout or "").strip().splitlines()
-    return False, (tail[-1] if tail else f"rclone exit {p.returncode}")[:200]
+    cmd = ["rclone", "copy", local, folder,
+           "--retries", "3", "--low-level-retries", "10",
+           "--stats", "15s", "--stats-one-line"]
+    return _run_rclone(cmd, 3600)
 
 
 def rclone_rcat(content, dest):
     """stdin → Drive 文件（网页内容.txt）。"""
-    p = subprocess.run(["rclone", "rcat", dest],
-                       input=content, capture_output=True, text=True,
-                       encoding="utf-8", timeout=300)
-    if p.returncode == 0:
-        return True, ""
-    tail = (p.stderr or p.stdout or "").strip().splitlines()
-    return False, (tail[-1] if tail else f"rclone exit {p.returncode}")[:200]
+    cmd = ["rclone", "rcat", dest]
+    return _run_rclone(cmd, 300, input_text=content)
 
 
 def rclone_delete(path):
@@ -509,12 +577,26 @@ def probe_drive(base, rows):
 
 # ---------------------------------------------------------------- 主流程
 
+def sniff_archive_kind(path):
+    """按文件头判断真实格式，不信扩展名。
+
+    2026-10-16 实测：安吉嘉好转椅配件厂的附件文件名是 .zip，
+    实际内容是 RAR5（file 命令确认），按扩展名路由给 zipfile
+    直接 "File is not a zip file"。PK 开头才是 zip，其余
+    （rar/7z/tar/gz…）统交 bsdtar。
+    """
+    with open(path, "rb") as f:
+        head = f.read(8)
+    return "zip" if head.startswith(b"PK") else "other"
+
+
 def do_archive(task, st, tmpdir, keep_temp=False):
     """下载压缩包 → 解压 → 逐个上传解出文件。返回 (成功数, 失败数, 字节数)。"""
     ok_n = fail_n = bytes_n = 0
-    work = os.path.join(tmpdir, sanitize(task["fname"], 100) or "archive")
+    work = os.path.join(tmpdir,
+                        clip_bytes(sanitize(task["fname"], 100) or "archive", 150))
     os.makedirs(work, exist_ok=True)
-    arc = os.path.join(work, sanitize(task["fname"], 120))
+    arc = os.path.join(work, clip_bytes(sanitize(task["fname"], 120), 150))
     try:
         got = download(task["oss"], arc)
     except Exception as e:
@@ -525,7 +607,7 @@ def do_archive(task, st, tmpdir, keep_temp=False):
         return 0, 1, 0
     log(f"        下载 {human(got)}，解压中…")
     try:
-        if task["fname"].lower().endswith(".zip"):
+        if sniff_archive_kind(arc) == "zip":
             inner = extract_zip(arc, work)
         else:
             inner = extract_bsdtar(arc, work)
