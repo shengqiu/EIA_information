@@ -120,13 +120,33 @@ def main():
     if not sid or not skey:
         sys.exit("请先设置环境变量 TENCENTCLOUD_SECRET_ID / TENCENTCLOUD_SECRET_KEY")
 
-    token = args.token or __import__("secrets").token_hex(24)
-    env = {"Variables": [{"Key": "SCRAPE_TOKEN", "Value": token}]}
-
     # 1. 函数是否已存在（不存在时静默，不打印 ResourceNotFound）
     r0 = call("GetFunction", {"FunctionName": args.function},
               sid, skey, args.region)
     exists = None if "Error" in r0.get("Response", {}) else r0.get("Response")
+
+    # token 决策（顺序：--token > 环境变量 SCRAPE_TOKEN > 函数里现有的 > 新生成）。
+    # 环境变量那份是 GitHub Actions 传来的 SCRAPE_TOKEN secret——daily.yml 用的
+    # 就是它，两边不一致时采集会 403，所以以 secret 为准并大声告警。
+    old_token = ""
+    if exists:
+        for kv in ((exists.get("Environment") or {}).get("Variables") or []):
+            if kv.get("Key") == "SCRAPE_TOKEN":
+                old_token = (kv.get("Value") or "").strip()
+    if args.token:
+        token = args.token
+    elif os.environ.get("SCRAPE_TOKEN", "").strip():
+        token = os.environ["SCRAPE_TOKEN"].strip()
+        if old_token and old_token != token:
+            print("⚠ 函数里的 SCRAPE_TOKEN 与 GitHub secret 不一致，已按 secret 覆盖")
+            print("  （daily.yml 用的是 secret 的值，不一致时每日采集会 403）")
+    elif old_token:
+        token = old_token
+        print("▶ 沿用函数里现有的 SCRAPE_TOKEN")
+    else:
+        token = __import__("secrets").token_hex(24)
+        print("▶ 生成了新的 SCRAPE_TOKEN，记得同步进 GitHub Secrets")
+    env = {"Variables": [{"Key": "SCRAPE_TOKEN", "Value": token}]}
 
     # 1b. 上次创建失败的函数是颗死子（CodeSize=0、建不了触发器），先删掉再重建
     if exists and (exists.get("Status") or "") == "CreateFailed":
@@ -244,9 +264,14 @@ def main():
         print("           去控制台 函数详情 → 函数 URL 里复制一下")
     print("=" * 62)
     print()
-    print("下一步：把上面两项填进 GitHub 仓库的 Secrets")
-    print("  SCRAPE_URL   = 函数 URL")
-    print(f"  SCRAPE_TOKEN = {token}")
+    if args.token or os.environ.get("SCRAPE_TOKEN", "").strip():
+        print("token 来自命令行/环境变量，GitHub Secrets 无需改动")
+    elif not old_token:
+        print("首次创建函数：把上面两项填进 GitHub 仓库的 Secrets")
+        print("  SCRAPE_URL   = 函数 URL")
+        print(f"  SCRAPE_TOKEN = {token}")
+    else:
+        print("token 沿用函数里的现值，GitHub Secrets 无需改动")
     return 0
 
 
