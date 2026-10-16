@@ -28,6 +28,14 @@ name: 附件同步 Google Drive
 # download.py --resolve 补进映射表才会出现在这里。
 
 on:
+  # 改了同步脚本或 workflow 自身 → 立即跑一次验证。
+  # state 去重，没有新文件时约 1 分钟空转（探活 + 退出），成本可忽略；
+  # 有待传文件时才真跑，正好是改完脚本想看到的结果。
+  push:
+    branches: [main]
+    paths:
+      - 'tools/to_drive.py'
+      - '.github/workflows/drive.yml'
   # 主触发：每日采集跑完（daily.yml 已把云函数解析好的直链写进 data/oss_links.csv）
   # 就紧接着同步，约 09:05 CST 开工。daily.yml 失败时不触发（也没新东西可传）。
   workflow_run:
