@@ -1,4 +1,4 @@
-# WorkBuddy Project · 湖州环保环评公示监测
+# WorkBuddy Project · 环评审批数据导入
 
 > 给未来的会话看：先读这个文件，再决定动哪里的代码。
 > 本目录（`/workspace`）已被设为 **WorkBuddy 项目工作区根目录**——新建任务时在输入框左下角「选择工作空间」选这个目录，就能接着这个项目继续。
@@ -14,8 +14,8 @@
 | 项 | 值 |
 |---|---|
 | 工作空间根目录 | `/workspace`（**本目录本身就是项目根目录**，不是子目录） |
-| GitHub | https://github.com/shengqiu/huzhou（**public**，Pages 要求免费计划必须公开） |
-| 线上看板 | **https://shengqiu.github.io/huzhou/** ✅ 249 条 |
+| GitHub | https://github.com/shengqiu/EIA_information（**public**，Pages 要求免费计划必须公开） |
+| 线上看板 | **https://shengqiu.github.io/EIA_information/** ✅ 249 条 |
 | 采集结果 | 249 条公告 / 166 个项目，共 87 个附件 ≈ 1 GB |
 | **境内云函数** | ✅ **已上线**：腾讯云 SCF `huzhou-epi-scrape`（ap-shanghai，函数 URL），16 栏目 2.8–5 秒跑完 |
 | 每日 09:00 | ✅ `daily.yml` 全绿实测：境外 runner → 调境内云函数 → 渲染 → 发布 |
