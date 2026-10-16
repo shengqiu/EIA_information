@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # 打一个能直接上传到腾讯云 SCF / 阿里云 FC 的 zip 包。
 #
-# 依赖必须打 Linux 平台的二进制（requests/bs4 有 C 扩展），
-# 在 Mac/Windows 上打包要加 --platform，否则云函数 import 会失败。
+# 依赖必须装 Linux/py3.10 版的轮子：SCF 运行环境是 Python3.10，
+# 在 Mac/Windows/GitHub Actions（py3.12）主机上直接 pip install 会装成
+# cp312 的轮子（charset_normalizer 等带 C 扩展），云函数 import 直接挂。
+# 所以无论什么主机，一律走 manylinux 交叉安装 + 只收二进制轮子。
 #
 #   ./cloud/build.sh           → cloud/dist/huzhou-scrape.zip
 set -euo pipefail
@@ -17,22 +19,13 @@ mkdir -p "$STAGE"
 cp monitor.py "$STAGE/"
 cp cloud/main.py "$STAGE/"
 
-echo "▶ 装 Linux 版依赖"
+echo "▶ 装 Linux py3.10 版依赖（manylinux 交叉安装，与主机 Python 版本无关）"
 PY="${PYTHON:-python3}"
-case "$(uname -s)" in
-  Darwin|MINGW*|MSYS*|CYGWIN*)
-    echo "  非 Linux 主机 → 指定 manylinux 平台"
-    "$PY" -m pip install --quiet --target "$STAGE" \
-      --platform manylinux2014_x86_64 \
-      --python-version 3.10 \
-      --only-binary=:all: --upgrade \
-      requests beautifulsoup4
-    ;;
-  *)
-    "$PY" -m pip install --quiet --target "$STAGE" --upgrade \
-      requests beautifulsoup4
-    ;;
-esac
+"$PY" -m pip install --quiet --target "$STAGE" \
+    --platform manylinux2014_x86_64 \
+    --python-version 3.10 \
+    --only-binary=:all: --upgrade \
+    requests beautifulsoup4
 
 # 云函数跑在只读目录，data/ 用不上，但 monitor.py 顶层会算路径，留个空壳保险
 mkdir -p "$STAGE/data" "$STAGE/reports"
