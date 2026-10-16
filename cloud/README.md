@@ -3,7 +3,9 @@
 > **状态：已上线（2026-09-30）**，腾讯云 SCF · 上海 · 函数 URL。
 > 实测：16 栏目扫描 184 条 / 2.8–5.1 秒 / 0 失败；`daily.yml` 每天 09:00 全链路通过。
 > 地址和 token **只存在 GitHub Secrets**（`SCRAPE_URL` / `SCRAPE_TOKEN`）里，别写进仓库。
-> 换地域/重建函数时直接跑：`python3 cloud/deploy_tc.py --region ap-shanghai --token <任意hex>`
+> **部署全自动**：`cloud/` 或 `monitor.py` 有改动推上 main → `.github/workflows/deploy-scf.yml`
+> 自动打包（manylinux py3.10 依赖）+ 调腾讯云 API 更新函数 + GET /health 冒烟测试，
+> 不用再去控制台传 zip。也可在 Actions 页手动 Run workflow。
 
 GitHub Actions 的托管 runner 在境外，访问不了 `hbj.huzhou.gov.cn`。
 把抓取放进**中国大陆的云函数**里，境外只负责调度和发布：
@@ -198,13 +200,19 @@ python3 tools/fetch_remote.py --dry-run
 
 Settings → Secrets and variables → Actions → **New repository secret**：
 
-| Secret | 值 |
-|---|---|
-| `SCRAPE_URL` | 上面拿到的公网 URL |
-| `SCRAPE_TOKEN` | 你设的口令 |
+| Secret | 值 | 用途 |
+|---|---|---|
+| `SCRAPE_URL` | 函数 URL | daily.yml 采集、部署后冒烟测试 |
+| `SCRAPE_TOKEN` | 函数口令 | daily.yml 鉴权；部署时对齐函数里的 token |
+| `TENCENTCLOUD_SECRET_ID` | 腾讯云 API SecretId | deploy-scf.yml 部署用 |
+| `TENCENTCLOUD_SECRET_KEY` | 腾讯云 API SecretKey | 同上 |
+
+> 腾讯云那两个建议建一个**只有 SCF 权限的子用户**（别用主账号密钥），
+> 权限给 `QcloudSCFFullAccess` 就够。
 
 之后 `daily.yml` 每天 09:00 会自动走云函数路线。
 没配 `SCRAPE_URL` 时该步骤自动跳过（不会失败）。
+改代码推 main 即自动部署；手动部署：Actions → 「部署采集云函数」→ Run workflow。
 
 ## 5. 先在本地验一遍
 
