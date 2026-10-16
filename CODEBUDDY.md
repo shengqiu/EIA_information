@@ -90,6 +90,7 @@ tools/mailer.py      按「项目」逐封发邮件 + 附件打包（需 SMTP_* 
 tools/to_drive.py    附件同步 Google Drive（rclone + Service Account，跑在 Actions）
 .github/workflows/pages.yml   只发布 reports/ 到 Pages（不采集）
 .github/workflows/drive.yml   附件每日同步 Google Drive（10:30 CST + 手动触发）
+.github/workflows/deploy-scf.yml   cloud/ 或 monitor.py 改动推 main → 自动打包+部署 SCF+冒烟测试
 data/  reports/      ← 已入库：Pages 的发布源就是仓库里的看板
 files/               ← gitignore（下载的附件本体）
 ```
@@ -156,7 +157,9 @@ files/               ← gitignore（下载的附件本体）
       网关地址 302/301 解析成 OSS 直链（`resolve: true` / `max_resolve: 40`，串行+0.4s 间隔防限流），
       随 `links[]` 返回；新增 `POST /resolve` 端点给 Actions 重试失败条目。
       `tools/fetch_remote.py` 按「网关地址」合并进 `data/oss_links.csv`（幂等，已测重跑 0 变更）。
-      **需要用户重新部署云函数后生效：`python3 cloud/deploy_tc.py --region ap-shanghai --token <hex>`**
-      ——在此之前 daily.yml 仍能跑（旧版函数忽略新参数，只是不返回 links）
+      **部署已全自动**：`cloud/**` 改动推 main 触发 `.github/workflows/deploy-scf.yml`
+      （打包 manylinux py3.10 依赖 → 调腾讯云 API 更新函数 → GET /health 冒烟测试），
+      无需再去控制台传 zip。需要 `TENCENTCLOUD_SECRET_ID` / `TENCENTCLOUD_SECRET_KEY`
+      两个 secret（建议只有 SCF 权限的子用户）
 - [x] **附件直达 Google Drive，不再经过邮件**：`daily.yml`（含文件解析）→ `workflow_run`
       触发 `drive.yml` → `to_drive.py` 沿 OSS 直链 rclone 上传。附件本体一条邮件都不用发
