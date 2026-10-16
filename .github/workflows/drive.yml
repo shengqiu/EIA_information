@@ -1,8 +1,15 @@
 name: 附件同步 Google Drive
 
-# 把 data/oss_links.csv 里的附件（OSS 直链）上传到 Google Drive。
-# OSS 直链境外可达（Actions 出口实测 206、250~324KB/s），所以下载+上传都能在
-# Actions 闭环；被挡的政务网网关全程不碰。公开仓库 Actions 免费。
+# 把环评项目同步到 Google Drive，目录结构（2026-10-16 起，按用户要求重做，
+# 原来是 <base>/<分局>/<项目>/，现在是不按分局的扁平一层）：
+#
+#     gdrive:湖州线索/
+#       └── <项目名称>/
+#             ├── 网页内容.txt          ← 公告标题/类型/日期/链接/项目明细/正文
+#             └── 解压后的环评附件        ← .pdf 直接传；.zip/.rar/.7z 下载解压后传
+#
+# OSS 直链境外可达（Actions 出口实测 206、250~324KB/s），所以「下载 + 解压 +
+# 上传」都能在 Actions 闭环；被挡的政务网网关全程不碰。公开仓库 Actions 免费。
 #
 # 凭证只走 GitHub Secrets，仓库里没有任何密钥。两种模式二选一：
 #   模式 1（Service Account，默认）：GDRIVE_SA_JSON + DRIVE_FOLDER_ID
@@ -15,8 +22,10 @@ name: 附件同步 Google Drive
 #       把输出的 JSON 存进 secret。配了 GDRIVE_TOKEN 就自动切到此模式。
 # 一次性配置见 docs/04-附件下载.md「同步到 Google Drive」一节。
 #
-# 增量续跑：data/drive_state.json 记账，已传的跳过；每传完一个就落盘，中途挂了
-# 下次接着跑。新附件要等境内跑一次 download.py --resolve 补进映射表才会出现在这里。
+# 增量续跑：data/drive_state.json 按目标文件记账（text|/url|/file|/arc| 键），
+# 已传的跳过；每传完一个就落盘，中途挂了下次接着跑。压缩包全部解出文件都传完
+# 才标记 arc 任务完成，下次不再重复下载。新附件要等境内跑一次
+# download.py --resolve 补进映射表才会出现在这里。
 
 on:
   # 主触发：每日采集跑完（daily.yml 已把云函数解析好的直链写进 data/oss_links.csv）
@@ -45,6 +54,11 @@ jobs:
 
       - name: 装 rclone
         run: curl https://rclone.org/install.sh | sudo bash
+
+      # .rar/.7z 附件解压依赖 bsdtar（libarchive，能正确处理中文文件名）；
+      # .zip 走 Python zipfile，不需要外部工具。ubuntu-latest 默认没有 bsdtar。
+      - name: 装 bsdtar（rar 解压）
+        run: sudo apt-get update && sudo apt-get install -y libarchive-tools
 
       - name: 写 Drive 凭证（只进 runner 临时目录，不进 git）
         env:
