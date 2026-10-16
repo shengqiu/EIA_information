@@ -659,6 +659,7 @@ def do_archive(task, st, tmpdir, keep_temp=False):
                                        "inner": [n for n, _ in inner],
                                        "at": datetime.now(timezone.utc)
                                        .strftime("%Y-%m-%dT%H:%M:%SZ")}
+        st["failed"].pop(task["key"], None)   # 清掉可能残留的旧失败记录
         save_state(st)
     if not keep_temp:
         shutil.rmtree(work, ignore_errors=True)
