@@ -102,6 +102,24 @@ def unwrap(resp, what):
     return r
 
 
+def wait_active(function, sid, skey, region, tries=40, interval=3):
+    """等函数离开 Creating/Updating 态，返回最终状态。
+
+    UpdateFunctionCode 之后函数会进入 Updating 态，这时立刻调
+    UpdateFunctionConfiguration 会被拒（FailedOperation：当前函数处于
+    Updating状态）——必须等它回到 Active。2026-10-16 Actions 首跑实测踩到。
+    """
+    for _ in range(tries):
+        r0 = call("GetFunction", {"FunctionName": function}, sid, skey, region)
+        st = ((r0.get("Response") or {}).get("Status") or "")
+        if st and st != "Creating" and st != "Updating":
+            print(f"  状态 {st}")
+            return st
+        time.sleep(interval)
+    print(f"  （等了 {tries * interval}s 仍未就绪，继续尝试后续操作）")
+    return ""
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--region", default="ap-shanghai")
@@ -175,6 +193,9 @@ def main():
                         sid, skey, args.region), "更新代码")
         if r is None:
             return 1
+        # 代码更新后函数进入 Updating 态，立刻改配置会被拒，先等它回 Active
+        print("▶ 等待代码更新完成")
+        wait_active(args.function, sid, skey, args.region)
         r = unwrap(call("UpdateFunctionConfiguration",
                         {"FunctionName": args.function,
                          "MemorySize": args.memory, "Timeout": args.timeout,
@@ -199,16 +220,10 @@ def main():
             return 1
 
     # 2. 开函数 URL（API 网关已停服，这是官方替代）
-    #    刚建好的函数状态是 Creating，这会儿建触发器会被拒，先等它 Active
+    #    刚建好/刚更新完的函数可能是 Creating/Updating 态，这会儿建触发器
+    #    会被拒，统一走 wait_active 等它回 Active
     print("▶ 等待函数状态就绪")
-    for _ in range(30):
-        r0 = call("GetFunction", {"FunctionName": args.function},
-                  sid, skey, args.region)
-        st = ((r0.get("Response") or {}).get("Status") or "")
-        if st and st != "Creating" and st != "Updating":
-            print(f"  状态 {st}")
-            break
-        time.sleep(3)
+    wait_active(args.function, sid, skey, args.region)
 
     desc = {
         "AuthType": "NONE",                       # 开放，函数内部自己校验 token
