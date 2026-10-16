@@ -7,6 +7,93 @@
 - 线上看板：**https://shengqiu.github.io/huzhou/**
 - 附件去向：Google Drive `湖州线索/<项目名称>/`（网页内容.txt + 解压后的附件）
 
+## 🚀 新人部署指南：30 分钟从零到全自动
+
+> **目标**：Fork 本仓库 → 配 6 个 secret → 之后每天 09:00（北京时间）全自动运转。
+> **唯一必须在境外动手的步骤**是部署一个境内云函数（约 10 分钟，费用 ≈0.05 元/月）——
+> 因为 GitHub Actions 的机房在境外，采不了政务站（下文「⚠️ 约束」有实测数据）。
+
+### 第 1 步：Fork 仓库，开 Pages（2 分钟）
+
+1. 页面右上角 **Fork** 到你自己名下（仓库必须 **public**——GitHub Pages 免费计划要求）
+2. 进 Fork 的仓库 → **Actions** 标签 → 点 **I understand, enable workflows**
+3. **Settings → Pages → Source 选「GitHub Actions」**（deploy 用的就是官方 Actions 发布）
+
+### 第 2 步：部署境内采集云函数（10 分钟）
+
+> Fork 不会继承 secret，这一步的产物（函数 URL + token）正好就是下一步要配的 secret。
+
+1. 注册/登录**腾讯云**（需实名），右上角【头像 → 访问管理 → API 密钥管理】新建一对
+   SecretId / SecretKey（建议建一个只有 SCF 权限的子用户，别用主账号）
+2. **先开通 CLS 日志服务**：https://console.cloud.tencent.com/cls 点「立即开通」
+   （免费额度够用；**不开通 SCF 建不出函数**，这是最常见的第一个坑）
+3. Fork 仓库 → **Settings → Secrets and variables → Actions → New repository secret**，
+   新建 `TENCENTCLOUD_SECRET_ID` 和 `TENCENTCLOUD_SECRET_KEY`
+4. **Actions → 「部署采集云函数（腾讯云 SCF）」→ Run workflow**，等它跑完
+   （打包 → 更新函数 → 冒烟测试，约 3 分钟；结尾会打印 `✓ 云函数在线，16 个栏目`）
+5. 展开日志里「部署到腾讯云 SCF」这步，抄下最后打印的两行：
+
+   ```
+   函数 URL     https://xxx.ap-shanghai.tencentscf.com/api/v1/xxx   ← 配成 SCRAPE_URL
+   SCRAPE_TOKEN  xxxxxxxxx                                          ← 配成 SCRAPE_TOKEN
+   ```
+
+### 第 3 步：配齐 secret，手动验证一次（5 分钟）
+
+把第 2 步拿到的两项配成 secret：`SCRAPE_URL`、`SCRAPE_TOKEN`。
+然后 **Actions → 「每日采集并发布」→ Run workflow** 手动跑一次，确认：
+
+- 日志出现 `::notice::公告 N 条 / 附件 M 个`（N > 0）
+- 几分钟后 `https://<你的用户名>.github.io/<仓库名>/` 能打开看板
+
+到这一步**核心链路已通**，每天 09:00 会自动采+发，不用再管。
+
+### 第 4 步（可选）：Google Drive 附件同步（10 分钟）
+
+1. 自己电脑装 rclone，跑 `rclone authorize "drive"`，浏览器登录授权，
+   把输出的 JSON 整段存为 secret **`GDRIVE_TOKEN`**
+2. Drive 网页建一个文件夹（如 `湖州线索`），URL 最后一段存为 secret **`DRIVE_FOLDER_ID`**
+3. **Actions → 「附件同步 Google Drive」→ Run workflow**
+4. 日志出现 `Drive 凭证模式：OAuth 用户授权` 即切换成功；
+   跑完后 Drive 里就是 `湖州线索/<项目>/网页内容.txt + 解压后附件`
+
+### 第 5 步（可选）：邮件推送（5 分钟）
+
+配 `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` / `MAIL_FROM` / `MAIL_TO`
+（QQ 邮箱用 16 位 SMTP 授权码，不是登录密码）。**该 Action 只手动触发**——
+定时发送已停用（附件改走 Drive 后邮件不再是必经路径），需要补发时
+Run workflow 即可，每次 1 封、默认只发链接。
+
+### 部署完成后的日常
+
+| 事项 | 还要管吗 |
+|---|---|
+| 每天采集 + 看板发布 | 不用，09:00 自动 |
+| 新附件进 Google Drive | 不用，采集完自动触发同步 |
+| 采集器代码更新（`cloud/**`） | 推上 main 自动部署 + 冒烟测试 |
+| Drive 配额 | OAuth 模式占你本人 15GB；附件约 1GB，够用 |
+| 腾讯云费用 | 约 0.05 元/月（SCF 免费额度内） |
+
+### 全部 secret 一览
+
+| secret | 必需 | 用途 | 去哪拿 |
+|---|---|---|---|
+| `TENCENTCLOUD_SECRET_ID` / `_KEY` | 部署期 | 调腾讯云 API 部署函数 | 腾讯云 API 密钥管理 |
+| `SCRAPE_URL` | ✅ | 云函数地址 | 第 2 步日志 |
+| `SCRAPE_TOKEN` | ✅ | 调用云函数的鉴权 token | 第 2 步日志 |
+| `GDRIVE_TOKEN` + `DRIVE_FOLDER_ID` | 可选 | Drive 同步 | `rclone authorize "drive"` + 文件夹 URL |
+| `SMTP_*` / `MAIL_TO` | 可选 | 邮件推送 | 邮箱 SMTP 授权码 |
+
+### 部署失败的三个常见坑
+
+| 症状 | 原因 | 解法 |
+|---|---|---|
+| 云函数创建失败，状态 `CreateFailed` | 没开通 CLS 日志服务 | https://console.cloud.tencent.com/cls 点「立即开通」，重跑部署 |
+| 采集 0 条，看板没更新 | `SCRAPE_URL`/`SCRAPE_TOKEN` 没配或不一致 | 核对两个 secret；token 以部署日志打印的值为准 |
+| Drive 上传 403 `storage quota` | 用了 Service Account 模式（配额为 0） | 配 `GDRIVE_TOKEN` 切 OAuth 模式，别用 `GDRIVE_SA_JSON` |
+
+---
+
 ## ⚠️ 一条约束决定整个架构：境外 IP 采不了政务站
 
 `hbj.huzhou.gov.cn` 拒绝境外访问（实测 GitHub Actions 16 个栏目全部超时，504 秒 0 条）。
