@@ -19,6 +19,8 @@
 | 采集结果 | 249 条公告 / 166 个项目，共 87 个附件 ≈ 1 GB |
 | **境内云函数** | ✅ **已上线**：腾讯云 SCF `huzhou-epi-scrape`（ap-shanghai，函数 URL），16 栏目 2.8–5 秒跑完 |
 | 每日 09:00 | ✅ `daily.yml` 全绿实测：境外 runner → 调境内云函数 → 渲染 → 发布 |
+| SCF 部署 | ✅ **全自动**：`cloud/**` 改动推 main → `deploy-scf.yml` 打包+更新函数+冒烟测试（2026-10-16 实测通过，修掉了 Updating 态竞态） |
+| Drive 同步 | ✅ `drive.yml`：按项目扁平一层（`湖州线索/<项目>/网页内容.txt + 解压后附件`），OAuth 模式，改脚本即自动跑 |
 
 ## ⚠️ 头号约束：境外 IP 访问不了 hbj.huzhou.gov.cn
 
