@@ -72,4 +72,4 @@ fi
 echo "▶ 推送 → GitHub Pages 自动发布"
 git push origin "$(git branch --show-current)"
 
-echo "✅ 完成，稍等 1~2 分钟访问 https://shengqiu.github.io/huzhou/"
+echo "✅ 完成，稍等 1~2 分钟访问 https://shengqiu.github.io/EIA_information/"
