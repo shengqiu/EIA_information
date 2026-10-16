@@ -87,9 +87,9 @@ tools/fetch_remote.py  调云函数取新公告并合并进 data/items.json
 tools/render.py      只渲染看板不采集（境外 runner 用）
 tools/download.py    附件下载 + OSS 直链解析
 tools/mailer.py      按「项目」逐封发邮件 + 附件打包（需 SMTP_* 环境变量）
-tools/to_drive.py    附件同步 Google Drive（rclone + Service Account，跑在 Actions）
+tools/to_drive.py    附件同步 Google Drive：湖州线索/<项目>/网页内容.txt + 解压后附件（跑在 Actions）
 .github/workflows/pages.yml   只发布 reports/ 到 Pages（不采集）
-.github/workflows/drive.yml   附件每日同步 Google Drive（10:30 CST + 手动触发）
+.github/workflows/drive.yml   附件每日同步 Google Drive，按项目扁平一层（10:30 CST + 手动触发）
 .github/workflows/deploy-scf.yml   cloud/ 或 monitor.py 改动推 main → 自动打包+部署 SCF+冒烟测试
 data/  reports/      ← 已入库：Pages 的发布源就是仓库里的看板
 files/               ← gitignore（下载的附件本体）
@@ -139,20 +139,17 @@ files/               ← gitignore（下载的附件本体）
       配合 `aria2` 可按直链整包拉附件）
 - [ ] 换 fine-grained token：现在用的是 classic PAT（repo+workflow），权限过大，且明文写在 git remote 里
 - [x] **附件同步 Google Drive 已上 Actions**：`tools/to_drive.py` + `.github/workflows/drive.yml`
-      （每日 10:30 CST + 手动触发）。OSS 直链境外可达，rclone copyurl 流式上传，
-      Service Account + 共享文件夹认证，`data/drive_state.json` 断点续跑。
-      凭证只走 Secrets（`GDRIVE_SA_JSON` / `DRIVE_FOLDER_ID`）
-      - [ ] **卡在分享配置上（2026-10-15 首跑 101 个全挂）**：症状是全部文件
+      （每日 10:30 CST + 手动触发）。OSS 直链境外可达，`data/drive_state.json` 断点续跑。
+      凭证只走 Secrets（`GDRIVE_TOKEN` / `DRIVE_FOLDER_ID`，OAuth 模式；SA 模式兼容但无配额）
+      - [x] **卡在分享配置上（2026-10-15 首跑 101 个全挂）**：症状是全部文件
             `failed to make directory: 404 File not found`。404（不是 401）说明 SA 密钥
-            没问题，是共享文件夹对它不可见。需用户在 Drive 网页把该文件夹分享给
-            SA 邮箱（`drive-save@clau-511714.iam.gserviceaccount.com`，编辑者）；
-            文件夹若在「共享云端硬盘」里，须把 SA 加为磁盘成员。代码侧已加
+            没问题，是共享文件夹对它不可见。代码侧已加
             `probe_drive` 探活：访问不通就 10 秒内带排查清单退出，不再空跑 10 分钟；
             回写步骤也改成先 `pull --rebase` 再推（首跑因并发提交被拒丢过状态）。
-            分享修好后仍会撞第二堵墙：`Service Accounts do not have storage
-            quota` 403——SA 配额为 0，只能传共享云端硬盘。免费个人账号走
+            之后又撞第二堵墙：`Service Accounts do not have storage
+            quota` 403——SA 配额为 0，只能传共享云端硬盘。已切
             OAuth 用户授权（`GDRIVE_TOKEN` secret，workflow 自动切模式），
-            详见 docs/04。修好后手动触发 drive.yml，state 会断点续跑
+            详见 docs/04。run #3 以 OAuth 模式传了 6 个后被手动取消，state 已记账
 - [x] **直链解析自动化（不用再手动 resolve）**：`cloud/main.py` 在采集时顺带把新附件的
       网关地址 302/301 解析成 OSS 直链（`resolve: true` / `max_resolve: 40`，串行+0.4s 间隔防限流），
       随 `links[]` 返回；新增 `POST /resolve` 端点给 Actions 重试失败条目。
@@ -162,4 +159,10 @@ files/               ← gitignore（下载的附件本体）
       无需再去控制台传 zip。需要 `TENCENTCLOUD_SECRET_ID` / `TENCENTCLOUD_SECRET_KEY`
       两个 secret（建议只有 SCF 权限的子用户）
 - [x] **附件直达 Google Drive，不再经过邮件**：`daily.yml`（含文件解析）→ `workflow_run`
-      触发 `drive.yml` → `to_drive.py` 沿 OSS 直链 rclone 上传。附件本体一条邮件都不用发
+      触发 `drive.yml` → `to_drive.py` 沿 OSS 直链上传。附件本体一条邮件都不用发
+- [x] **Drive 目录改为按项目扁平一层（2026-10-16）**：`湖州线索/<项目名称>/` 下第一个
+      文件是 `网页内容.txt`（公告标题/类型/日期/链接/项目明细/正文，取自 items.json），
+      其余是**解压后**的附件（.pdf 直接 copyurl；.zip 走 Python zipfile，GBK 内名
+      cp437→gbk 还原；.rar/.7z 走 bsdtar）。不再按分局组织、不再原样传压缩包。
+      旧「环评附件/」目录需在 Drive 网页手动删；state 换 `text|/url|/file|/arc|` 键，
+      旧记录自动隔离、全量重传
