@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-湖州环评公示监测
+环评审批数据导入
 ================
 定时采集湖州市生态环境局「行政审批（许可）公示」下所有环评相关栏目的公示公告，
 解析公告内的项目明细（项目名称 / 建设地点 / 建设单位 / 环评机构 / 受理日期 / 附件），
@@ -425,7 +425,7 @@ def build_html(items, new_ids, stat):
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>湖州环评公示看板</title>
+<title>环评审批数据导入</title>
 <style>
 :root {{
   --bg:#f5f7fa; --card:#fff; --line:#e6e9ef; --txt:#1f2430; --sub:#6b7280;
@@ -471,7 +471,7 @@ footer {{ text-align:center; color:var(--sub); font-size:12px; padding:20px 0 34
 </head>
 <body>
 <header>
-  <h1>湖州市生态环境局 · 环评公示监测看板</h1>
+  <h1>湖州市生态环境局 · 环评审批数据导入</h1>
   <p>数据来源：湖州市生态环境局官网「行政审批（许可）公示」| 更新于 {generated}</p>
 </header>
 <div class="wrap">
