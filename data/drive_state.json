@@ -1,8 +1,8 @@
 {
  "failed": {
   "url|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/20267/c5a3df93565d4b7194244b1156c746dd.pdf?fileName=20260721%E5%85%AC%E7%A4%BA%E7%A8%BF--%E6%B5%99%E6%B1%9F%E6%B1%87%E9%9A%86%E6%96%B0%E6%9D%90%E6%96%99%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E5%B9%B4%E4%BA%A727%E4%B8%87%E5%90%A8%E7%BB%BF%E8%89%B2%E6%96%B0%E6%9D%90%E6%96%99%E5%8F%8A1000%E4%B8%87%E5%A5%97%E6%88%B7%E5%A4%96%E7%94%A8%E5%93%81%E6%95%B0%E5%AD%97%E5%8C%96%E5%B7%A5%E5%8E%82%E9%A1%B9%E7%9B%AE%E9%85%8D%E5%A5%97%E5%8F%8C%E5%9B%9E%E8%B7%AF%E4%BE%9B%E7%94%B5%E5%8F%98%E5%8E%8B%E7%B3%BB%E7%BB%9F%E9%A1%B9%E7%9B%AE%EF%BC%88%E5%85%AC%E7%A4%BA%E7%A8%BF%EF%BC%89.pdf": {
-   "at": "2026-10-16T04:07:48Z",
-   "error": "2026/10/16 04:08:31 NOTICE: Failed to copyurl: CopyURL failed: 403 Forbidden",
+   "at": "2026-10-16T05:18:36Z",
+   "error": "2026/10/16 05:18:49 NOTICE: Failed to copyurl: CopyURL failed: 403 Forbidden",
    "file": "20260721公示稿--浙江汇隆新材料股份有限公司年产27万吨绿色新材料及1000万套户外用品数字化工厂项目配套双回路供电变压系统项目（公示稿）.pdf"
   }
  },
@@ -215,6 +215,13 @@
     "天子湖化工园区污水处理厂环境影响评价报告+公示稿+1.pdf"
    ]
   },
+  "arc|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/20268/4de74fb5c6f8461ba28155ae66e968fe.zip?fileName=%E6%B9%96%E5%B7%9E%E7%BE%8E%E6%99%AE%E5%85%B0%E7%B2%BE%E5%AF%86%E9%94%BB%E9%80%A0%E6%9C%89%E9%99%90%E8%B4%A3%E4%BB%BB%E5%85%AC%E5%8F%B8%E6%89%A9%E5%BB%BA%E9%A1%B9%E7%9B%AE%20%E6%8A%A5%E5%91%8A%E8%A1%A8%20%E5%85%AC%E7%A4%BA%E7%A8%BF.zip": {
+   "at": "2026-10-16T05:18:36Z",
+   "file": "湖州美普兰精密锻造有限责任公司扩建项目 报告表 公示稿.zip",
+   "inner": [
+    "湖州美普兰精密锻造有限责任公司扩建项目 报告表 公示稿 .pdf"
+   ]
+  },
   "arc|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/20268/5323a05b593b4c95949865320b365175.rar?fileName=%E5%85%AC%E7%A4%BA%E7%A8%BF-%E5%9B%BD%E7%BD%91%E6%B5%99%E6%B1%9F%E6%B9%96%E5%B7%9E110kV%E5%90%89%E5%B1%B11562%E8%8D%89%E8%8D%A1%E6%94%AF%E7%BA%BF%E6%B0%B4%E6%B3%A5%E6%9D%86%E6%94%B9%E9%80%A0%E9%A1%B9%E7%9B%AE.rar": {
    "at": "2026-10-16T02:03:30Z",
    "file": "公示稿-国网浙江湖州110kV吉山1562草荡支线水泥杆改造项目.rar",
@@ -380,6 +387,13 @@
    "file": "（公示稿）长兴诗悦纺织科技有限公司.rar",
    "inner": [
     "（公示稿）长兴诗悦纺织科技有限公司.pdf"
+   ]
+  },
+  "arc|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/20269/7d5fe37ab7f246cfbce6cedcc4094496.rar?fileName=%E5%BB%BA%E8%AE%BE%E9%A1%B9%E7%9B%AE%E7%8E%AF%E5%A2%83%E5%BD%B1%E5%93%8D%E6%8A%A5%E5%91%8A%E8%A1%A8--%E5%8F%8C%E9%B9%A4%28%E5%85%AC%E7%A4%BA%E7%A8%BF%29.rar": {
+   "at": "2026-10-16T05:17:39Z",
+   "file": "建设项目环境影响报告表--双鹤(公示稿).rar",
+   "inner": [
+    "建设项目环境影响报告表--双鹤(公示稿).pdf"
    ]
   },
   "arc|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/20269/7e60276b20fd41b582c4cc5a8ced40c7.rar?fileName=%EF%BC%88%E5%85%AC%E7%A4%BA%E7%89%88%EF%BC%89%E5%BE%B7%E6%B8%85%E5%BE%B7%E4%B8%BA%E6%96%B0%E6%9D%90%E6%96%99%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E5%B9%B4%E4%BA%A720%E4%B8%87%E5%8F%B0%E5%A5%97%E9%80%8F%E6%98%8E%E5%90%B8%E6%B3%A2%E4%BD%93%E6%9D%90%E6%96%99%E6%99%BA%E8%83%BD%E5%85%89%E7%94%B5%E8%86%9C%E9%A1%B9%E7%9B%AE%E7%94%9F%E6%80%81%E7%8E%AF%E5%A2%83%E5%BD%B1%E5%93%8D%E6%8A%A5%E5%91%8A%E8%A1%A8%281%29.rar": {
@@ -762,6 +776,12 @@
    "file": "天子湖化工园区污水处理厂环境影响评价报告+公示稿+1.pdf",
    "size": 15173889
   },
+  "file|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/20268/4de74fb5c6f8461ba28155ae66e968fe.zip?fileName=%E6%B9%96%E5%B7%9E%E7%BE%8E%E6%99%AE%E5%85%B0%E7%B2%BE%E5%AF%86%E9%94%BB%E9%80%A0%E6%9C%89%E9%99%90%E8%B4%A3%E4%BB%BB%E5%85%AC%E5%8F%B8%E6%89%A9%E5%BB%BA%E9%A1%B9%E7%9B%AE%20%E6%8A%A5%E5%91%8A%E8%A1%A8%20%E5%85%AC%E7%A4%BA%E7%A8%BF.zip#湖州美普兰精密锻造有限责任公司扩建项目 报告表 公示稿 .pdf": {
+   "at": "2026-10-16T05:18:36Z",
+   "dest": "gdrive:湖州线索/湖州美普兰精密锻造有限责任公司新增年产3000万件汽车关键部位轴承与齿轮精密锻件、 1800万件轿车轮毂单元与万向节、球笼精密锻件项目/湖州美普兰精密锻造有限责任公司扩建项目 报告表 公示稿 .pdf",
+   "file": "湖州美普兰精密锻造有限责任公司扩建项目 报告表 公示稿 .pdf",
+   "size": 24188114
+  },
   "file|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/20268/5323a05b593b4c95949865320b365175.rar?fileName=%E5%85%AC%E7%A4%BA%E7%A8%BF-%E5%9B%BD%E7%BD%91%E6%B5%99%E6%B1%9F%E6%B9%96%E5%B7%9E110kV%E5%90%89%E5%B1%B11562%E8%8D%89%E8%8D%A1%E6%94%AF%E7%BA%BF%E6%B0%B4%E6%B3%A5%E6%9D%86%E6%94%B9%E9%80%A0%E9%A1%B9%E7%9B%AE.rar#公示稿-国网浙江湖州110kV吉山1562草荡支线水泥杆改造项目.pdf": {
    "at": "2026-10-16T02:03:30Z",
    "dest": "gdrive:湖州线索/国网浙江湖州110kV吉山1562草荡支线水泥杆改造项目/公示稿-国网浙江湖州110kV吉山1562草荡支线水泥杆改造项目.pdf",
@@ -935,6 +955,12 @@
    "dest": "gdrive:湖州线索/年产各类纺织面料1400万米、化纤丝6700吨扩建项目/（公示稿）长兴诗悦纺织科技有限公司.pdf",
    "file": "（公示稿）长兴诗悦纺织科技有限公司.pdf",
    "size": 10527820
+  },
+  "file|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/20269/7d5fe37ab7f246cfbce6cedcc4094496.rar?fileName=%E5%BB%BA%E8%AE%BE%E9%A1%B9%E7%9B%AE%E7%8E%AF%E5%A2%83%E5%BD%B1%E5%93%8D%E6%8A%A5%E5%91%8A%E8%A1%A8--%E5%8F%8C%E9%B9%A4%28%E5%85%AC%E7%A4%BA%E7%A8%BF%29.rar#建设项目环境影响报告表--双鹤(公示稿).pdf": {
+   "at": "2026-10-16T05:17:39Z",
+   "dest": "gdrive:湖州线索/长兴县双鹤服装材料有限公司年产高档纺织面料2300万米技改项目/建设项目环境影响报告表--双鹤(公示稿).pdf",
+   "file": "建设项目环境影响报告表--双鹤(公示稿).pdf",
+   "size": 15561498
   },
   "file|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/20269/7e60276b20fd41b582c4cc5a8ced40c7.rar?fileName=%EF%BC%88%E5%85%AC%E7%A4%BA%E7%89%88%EF%BC%89%E5%BE%B7%E6%B8%85%E5%BE%B7%E4%B8%BA%E6%96%B0%E6%9D%90%E6%96%99%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E5%B9%B4%E4%BA%A720%E4%B8%87%E5%8F%B0%E5%A5%97%E9%80%8F%E6%98%8E%E5%90%B8%E6%B3%A2%E4%BD%93%E6%9D%90%E6%96%99%E6%99%BA%E8%83%BD%E5%85%89%E7%94%B5%E8%86%9C%E9%A1%B9%E7%9B%AE%E7%94%9F%E6%80%81%E7%8E%AF%E5%A2%83%E5%BD%B1%E5%93%8D%E6%8A%A5%E5%91%8A%E8%A1%A8%281%29.rar#（公示版）德清德为新材料有限公司年产20万台套透明吸波体材料智能光电膜项目生态环境影响报告表(1).pdf": {
    "at": "2026-10-16T01:22:56Z",
@@ -1620,6 +1646,12 @@
    "file": "网页内容.txt",
    "size": 3647
   },
+  "text|湖州美普兰精密锻造有限责任公司新增年产3000万件汽车关键部位轴承与齿轮精密锻件、 1800万件轿车轮毂单元与万向节、球笼精密锻件项目": {
+   "at": "2026-10-16T05:17:39Z",
+   "dest": "gdrive:湖州线索/湖州美普兰精密锻造有限责任公司新增年产3000万件汽车关键部位轴承与齿轮精密锻件、 1800万件轿车轮毂单元与万向节、球笼精密锻件项目/网页内容.txt",
+   "file": "网页内容.txt",
+   "size": 4250
+  },
   "text|湖州聚乘年产1万吨减碳绿色制品及3D 打印线材项目": {
    "at": "2026-10-16T01:38:58Z",
    "dest": "gdrive:湖州线索/湖州聚乘年产1万吨减碳绿色制品及3D 打印线材项目/网页内容.txt",
@@ -1661,6 +1693,12 @@
    "dest": "gdrive:湖州线索/长兴兴盛燃气有限公司气体灌装项目/网页内容.txt",
    "file": "网页内容.txt",
    "size": 3713
+  },
+  "text|长兴县双鹤服装材料有限公司年产高档纺织面料2300万米技改项目": {
+   "at": "2026-10-16T05:16:46Z",
+   "dest": "gdrive:湖州线索/长兴县双鹤服装材料有限公司年产高档纺织面料2300万米技改项目/网页内容.txt",
+   "file": "网页内容.txt",
+   "size": 3583
   },
   "text|长兴国圆印染有限公司 智能化提升改造技改 项目": {
    "at": "2026-10-16T01:58:54Z",
