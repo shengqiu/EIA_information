@@ -1,0 +1,81 @@
+name: 部署采集云函数（腾讯云 SCF）
+
+# cloud/ 或 monitor.py 有改动推上 main 时，自动打包 + 部署到腾讯云 SCF，
+# 不再需要手动去控制台上传 zip。也可以网页手动触发（workflow_dispatch）。
+#
+# 凭证只走 GitHub Secrets（推荐建一个只有 SCF 权限的腾讯云子用户）：
+#   TENCENTCLOUD_SECRET_ID   腾讯云 API SecretId
+#   TENCENTCLOUD_SECRET_KEY  腾讯云 API SecretKey
+#   SCRAPE_TOKEN             已有；部署时对齐函数里的 token，防漂移
+#   SCRAPE_URL               已有；部署后冒烟测试用
+#
+# 函数 URL 只在首次创建时变，代码更新不影响它，所以不用回写 secret。
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cloud/**'
+      - 'monitor.py'
+      - '.github/workflows/deploy-scf.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scf-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 打 zip（Linux py3.10 manylinux 依赖）
+        run: bash cloud/build.sh
+
+      - name: 部署到腾讯云 SCF
+        env:
+          TENCENTCLOUD_SECRET_ID: ${{ secrets.TENCENTCLOUD_SECRET_ID }}
+          TENCENTCLOUD_SECRET_KEY: ${{ secrets.TENCENTCLOUD_SECRET_KEY }}
+          SCRAPE_TOKEN: ${{ secrets.SCRAPE_TOKEN }}
+        run: |
+          if [ -z "$TENCENTCLOUD_SECRET_ID" ] || [ -z "$TENCENTCLOUD_SECRET_KEY" ]; then
+            echo "::error::缺 TENCENTCLOUD_SECRET_ID / TENCENTCLOUD_SECRET_KEY secret，"
+            echo "          去 Settings → Secrets → Actions 添加（建议用只有 SCF 权限的子用户）"
+            exit 1
+          fi
+          python3 cloud/deploy_tc.py \
+            --region ap-shanghai \
+            --function huzhou-epi-scrape \
+            --zip cloud/dist/huzhou-scrape.zip
+
+      # 部署完立刻探活：函数在线 + token 对得上 + 栏目数正常。
+      # GET 任意路径都返回 health（main.py 里 method == "GET" 即健康检查）。
+      - name: 冒烟测试（GET /health）
+        env:
+          SCRAPE_URL: ${{ secrets.SCRAPE_URL }}
+          SCRAPE_TOKEN: ${{ secrets.SCRAPE_TOKEN }}
+        run: |
+          if [ -z "$SCRAPE_URL" ] || [ -z "$SCRAPE_TOKEN" ]; then
+            echo "::warning::缺 SCRAPE_URL / SCRAPE_TOKEN secret，跳过冒烟测试"
+            exit 0
+          fi
+          code=$(curl -sS --retry 3 --retry-delay 2 --max-time 60 \
+                 -o /tmp/health.json -w '%{http_code}' \
+                 "$SCRAPE_URL?token=$SCRAPE_TOKEN")
+          echo "HTTP $code → $(cat /tmp/health.json)"
+          if [ "$code" != "200" ]; then
+            echo "::error::部署后健康检查失败（HTTP $code），函数可能没起来或 token 不对"
+            exit 1
+          fi
+          python3 - <<'PY'
+          import json, sys
+          d = json.load(open("/tmp/health.json"))
+          assert d.get("ok") is True, d
+          assert d.get("auth") is True, "token 校验未通过（auth=false）"
+          assert d.get("columns") == 16, f"栏目数异常：{d.get('columns')}"
+          print(f"✓ 云函数在线，token 校验通过，{d['columns']} 个栏目")
+          PY
