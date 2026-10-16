@@ -37,6 +37,7 @@ DATA_DIR = os.path.join(ROOT, "data")
 ITEMS_PATH = os.path.join(DATA_DIR, "items.json")
 STATE_PATH = os.path.join(DATA_DIR, "state.json")
 CSV_PATH = os.path.join(DATA_DIR, "oss_links.csv")
+DRIVE_STATE_PATH = os.path.join(DATA_DIR, "drive_state.json")
 CSV_FIELDS = ["公告日期", "发布单位", "项目名称", "建设单位",
               "文件名", "大小", "OSS直链", "网关地址"]
 KEEP_DAYS = 550          # 历史库只留 18 个月，和 monitor.py 保持一致
@@ -214,11 +215,50 @@ def main():
     return 0
 
 
+def dead_link_gateways(rows):
+    """第三类漏网：CSV 里有直链、但直链本身已经死了的附件。
+
+    OSS 直链会过期（实测有 403 Forbidden 的），这类条目在 to_drive 的
+    drive_state.json 里记为 failed，但 CSV 里它「有直链」，前两类漏网
+    都扫不到它——不主动重解析就永远传不上 Drive。
+    只捞源链接侧的错（CopyURL failed / 403 / 404）；Drive 侧的错
+    （storage quota 等）与直链无关，不折腾。
+    """
+    if not os.path.exists(DRIVE_STATE_PATH):
+        return []
+    try:
+        with open(DRIVE_STATE_PATH, encoding="utf-8") as f:
+            st = json.load(f)
+    except Exception:
+        return []
+    failed = st.get("failed") or {}
+    if not failed:
+        return []
+    oss2gw = {}
+    for r in rows:
+        gw, oss = r.get("网关地址", ""), r.get("OSS直链", "")
+        if gw and oss:
+            oss2gw[oss] = gw
+    out = []
+    for oss, info in failed.items():
+        err = info.get("error") or ""
+        if "storage quota" in err or "googleapi" in err:
+            continue
+        if "CopyURL failed" not in err and "403" not in err and "404" not in err:
+            continue
+        gw = oss2gw.get(oss.strip())
+        if gw and gw not in out:
+            out.append(gw)
+    return out
+
+
 def do_resolve_missing(resolve_url, args):
-    """把缺直链的附件丢给云函数重试。补两类漏网：
+    """把缺直链的附件丢给云函数重试。补三类漏网：
     1) CSV 里有行但没直链的（比如指向政务外网专用域名的，重试也是失败，至少留个交代）
     2) items.json 里有附件、但压根没进 CSV 的 —— 半路升级新功能前的历史遗留，
        这类不主动捞一次就永远进不了 Google Drive。
+    3) CSV 里有直链但直链已死（OSS 403/404）的 —— to_drive 记了 failed 的，
+       重解析换条新链，下次同步自动成功。
     """
     rows = load_csv_rows()
     have = {r.get("网关地址", "").strip() for r in rows if r.get("网关地址")}
@@ -236,12 +276,15 @@ def do_resolve_missing(resolve_url, args):
                                 "项目名称": p.get("项目名称") or "",
                                 "建设单位": p.get("建设单位") or ""}
 
-    urls = missing + list(extra)
+    stale = [gw for gw in dead_link_gateways(rows)
+             if gw not in missing and gw not in extra]
+
+    urls = missing + list(extra) + stale
     if not urls:
         print("没有缺直链的条目，跳过")
         return 0
-    print(f"待补 {len(urls)} 条（CSV 缺直链 {len(missing)} + 新发现未入库 {len(extra)}）"
-          f" → {resolve_url.split('?')[0]}")
+    print(f"待补 {len(urls)} 条（CSV 缺直链 {len(missing)} + 新发现未入库 {len(extra)}"
+          f" + 失效直链重解析 {len(stale)}） → {resolve_url.split('?')[0]}")
     try:
         r = requests.post(resolve_url, json={"urls": urls}, timeout=args.timeout)
     except Exception as e:
