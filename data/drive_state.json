@@ -1,15 +1,5 @@
 {
  "failed": {
-  "arc|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/20268/958369e0313347639f17802067225686.zip?fileName=%E6%B9%96%E5%B7%9E%E9%87%91%E6%B4%81%E8%B5%84%E6%BA%90%E5%9B%9E%E6%94%B6%E5%88%A9%E7%94%A8%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E5%90%B4%E5%85%B4%E9%9D%99%E8%84%89%E4%BA%A7%E4%B8%9A%E5%86%8D%E7%94%9F%E5%88%A9%E7%94%A8%E4%B8%AD%E5%BF%83%E6%90%AC%E8%BF%81%E6%8A%80%E6%94%B9%E6%8F%90%E5%8D%87%E9%A1%B9%E7%9B%AE%E7%8E%AF%E5%A2%83%E5%BD%B1%E5%93%8D%E6%8A%A5%E5%91%8A%E4%B9%A6%E5%8F%8A%E5%85%AC%E4%BC%97%E5%8F%82%E4%B8%8E%E8%AF%B4%E6%98%8E.zip": {
-   "at": "2026-10-16T02:03:50Z",
-   "error": "[Errno 36] File name too long: '/tmp/huzhou_drive_jd4l82tz/湖州金洁资源回收利用有限公司吴兴静脉产业再生利用中心搬迁技改提升项目环境影响报告书及公众参与说明.zip/_σà¼Σ╝ùσÅéΣ╕Ä-µ╣ûσ╖₧Θçæµ┤üΦ╡äµ║Éσ¢₧µö╢σê⌐τö¿µ£ëΘÖÉσà¼σÅ╕σÉ┤σà┤Θ¥ÖΦäëΣ║ºΣ╕Üσåìτöƒσê⌐τö¿Σ╕¡σ┐âµÉ¼Φ┐üµèÇµö╣µÅÉσìçΘí╣τ¢«.pdf'",
-   "file": "湖州金洁资源回收利用有限公司吴兴静脉产业再生利用中心搬迁技改提升项目环境影响报告书及公众参与说明.zip"
-  },
-  "arc|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/20269/3782a6c07a3546de90e743c7c75f6c8f.zip?fileName=%E5%AE%89%E5%90%89%E5%98%89%E5%A5%BD%E8%BD%AC%E6%A4%85%E9%85%8D%E4%BB%B6%E5%8E%82%E5%B9%B4%E4%BA%A750%E4%B8%87%E5%A5%97%E8%BD%AC%E6%A4%85%E9%85%8D%E4%BB%B6%E7%94%9F%E4%BA%A7%E7%BA%BF%E9%A1%B9%E7%9B%AE%E6%8A%A5%E5%91%8A%E8%A1%A8%20-%20%E5%85%AC%E7%A4%BA%E7%A8%BF.zip": {
-   "at": "2026-10-16T01:49:57Z",
-   "error": "File is not a zip file",
-   "file": "安吉嘉好转椅配件厂年产50万套转椅配件生产线项目报告表 - 公示稿.zip"
-  },
   "url|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/20267/c5a3df93565d4b7194244b1156c746dd.pdf?fileName=20260721%E5%85%AC%E7%A4%BA%E7%A8%BF--%E6%B5%99%E6%B1%9F%E6%B1%87%E9%9A%86%E6%96%B0%E6%9D%90%E6%96%99%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E5%B9%B4%E4%BA%A727%E4%B8%87%E5%90%A8%E7%BB%BF%E8%89%B2%E6%96%B0%E6%9D%90%E6%96%99%E5%8F%8A1000%E4%B8%87%E5%A5%97%E6%88%B7%E5%A4%96%E7%94%A8%E5%93%81%E6%95%B0%E5%AD%97%E5%8C%96%E5%B7%A5%E5%8E%82%E9%A1%B9%E7%9B%AE%E9%85%8D%E5%A5%97%E5%8F%8C%E5%9B%9E%E8%B7%AF%E4%BE%9B%E7%94%B5%E5%8F%98%E5%8E%8B%E7%B3%BB%E7%BB%9F%E9%A1%B9%E7%9B%AE%EF%BC%88%E5%85%AC%E7%A4%BA%E7%A8%BF%EF%BC%89.pdf": {
    "at": "2026-10-16T04:07:48Z",
    "error": "2026/10/16 04:08:31 NOTICE: Failed to copyurl: CopyURL failed: 403 Forbidden",
