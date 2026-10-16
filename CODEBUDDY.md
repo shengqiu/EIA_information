@@ -139,7 +139,15 @@ files/               ← gitignore（下载的附件本体）
 - [ ] 决定 Cloudflare Worker 的去留（现在是个只能读 KV 的空壳）
 - [x] `data/oss_links.csv` 已纳入仓库（81 条 OSS 直链映射，mailer 直接用；
       配合 `aria2` 可按直链整包拉附件）
-- [ ] 换 fine-grained token：现在用的是 classic PAT（repo+workflow），权限过大，且明文写在 git remote 里
+- [x] ~~换 fine-grained token~~（2026-10-16 关闭）：原待办针对的是**旧沙箱工作区**的
+      git remote——当时 `/workspace` clone 过本仓库，classic PAT 明文写在 remote URL 里。
+      **用户本机从未 clone 过本仓库，无需任何操作**；且旧 classic PAT 已于当日吊销重建，
+      remote 里残留的明文随即失效，风险清零。若将来确需在境内机器手动跑
+      `publish.sh`：clone 后执行
+      `git config --global credential.helper 'cache --timeout=28800'`
+      托管凭据（token 只在内存，不落盘），**严禁把 token 写进 remote URL**；
+      新 token 用 fine-grained PAT，Only select repositories 只勾本仓库，
+      权限 `Contents: Read and write` 即可（如需 API 触发 workflow 再加 `Actions: write`）。
 - [x] **附件同步 Google Drive 已上 Actions**：`tools/to_drive.py` + `.github/workflows/drive.yml`
       （每日 10:30 CST + 手动触发）。OSS 直链境外可达，`data/drive_state.json` 断点续跑。
       凭证只走 Secrets（`GDRIVE_TOKEN` / `DRIVE_FOLDER_ID`，OAuth 模式；SA 模式兼容但无配额）
