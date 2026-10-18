@@ -21,6 +21,8 @@
 | 每日 09:00 | ✅ `daily.yml` 全绿实测：境外 runner → 调境内云函数 → 渲染 → 发布 |
 | SCF 部署 | ✅ **全自动**：`cloud/**` 改动推 main → `deploy-scf.yml` 打包+更新函数+冒烟测试（2026-10-16 实测通过，修掉了 Updating 态竞态） |
 | Drive 同步 | ✅ `drive.yml`：按项目扁平一层（`湖州线索/<项目>/网页内容.txt + 解压后附件`），OAuth 模式，改脚本即自动跑 |
+| 共享层 | ✅ `tools/eia_common.py`（2026-10-18）：数据加载/正文渲染/解压/文件名还原抽成共享模块，`to_drive.py` 改用，`--dry-run` 回归输出逐字节一致 |
+| Confluence 迁移 | ❌ **已放弃（2026-10-18）**：评估后实现过半，因 Free 计划仅 2GB 存储（附件月增 ≈442MB，只能撑 ~5 个月）而放弃；附件存储继续走 Google Drive。决策记录见待办区 |
 
 ## ⚠️ 头号约束：境外 IP 访问不了 hbj.huzhou.gov.cn
 
@@ -90,6 +92,7 @@ tools/render.py      只渲染看板不采集（境外 runner 用）
 tools/download.py    附件下载 + OSS 直链解析
 tools/mailer.py      按「项目」逐封发邮件 + 附件打包（需 SMTP_* 环境变量）
 tools/to_drive.py    附件同步 Google Drive：湖州线索/<项目>/网页内容.txt + 解压后附件（跑在 Actions）
+tools/eia_common.py  同步工具共享层：数据加载、正文渲染、解压、中文文件名还原（to_drive.py 在用）
 .github/workflows/pages.yml   只发布 reports/ 到 Pages（不采集）
 .github/workflows/drive.yml   附件每日同步 Google Drive，按项目扁平一层（10:30 CST + 手动触发）
 .github/workflows/deploy-scf.yml   cloud/ 或 monitor.py 改动推 main → 自动打包+部署 SCF+冒烟测试
@@ -176,3 +179,20 @@ files/               ← gitignore（下载的附件本体）
       cp437→gbk 还原；.rar/.7z 走 bsdtar）。不再按分局组织、不再原样传压缩包。
       旧「环评附件/」目录需在 Drive 网页手动删；state 换 `text|/url|/file|/arc|` 键，
       旧记录自动隔离、全量重传
+- [x] ~~附件存储搬到 Confluence（每项目一页 + 页面附件）~~（2026-10-18 放弃）：
+      用户想替换掉 Google Drive。实现完了共享层 `tools/eia_common.py` 和
+      `tools/to_confluence.py`（REST 客户端、find-or-create 页面、正文指纹跳过、
+      附件 multipart 上传、断点续跑、增量种子），本地用假 Confluence 服务器
+      + 真实 OSS 附件跑通全链路（含 409 重试、state 丢失恢复、死链记账）。
+      **放弃原因：Confluence Cloud Free 只有 2GB 存储**，而附件月增 ≈442MB
+      （2026-08/09/10 均值），只能撑 ~5 个月；升级 Standard 要 $7.15/用户/月，
+      违背项目「必须免费」的初衷。附件存储继续走 Google Drive（15GB 免费）。
+      代码保留在本地未提交；`eia_common.py` 共享层因回归无损被保留。
+      若将来存储诉求再变（如自建 Confluence/其他 Wiki），to_confluence.py
+      的 REST 打法可直接复用
+- [x] **`to_drive.py` 改用共享层 `eia_common.py`（2026-10-18）**：数据加载、
+      正文渲染、解压、中文文件名还原、大小解析全部抽到 `tools/eia_common.py`，
+      `to_drive.py` 只留 Drive 特有的 rclone 封装/探活/state/主流程。
+      `--dry-run` 输出与重构前逐字节一致（仅时间戳不同）；解压链路用真实附件
+      （金洁 zip / 安吉嘉好 rar-in-zip / 海杰 rar）在 Confluence 集成测试中
+      连带验证过。drive.yml 的 push paths 已加 `tools/eia_common.py`

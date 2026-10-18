@@ -35,6 +35,7 @@ on:
     branches: [main]
     paths:
       - 'tools/to_drive.py'
+      - 'tools/eia_common.py'   # 共享层：改了它 to_drive 行为可能变，一起验证
       - '.github/workflows/drive.yml'
   # 主触发：每日采集跑完（daily.yml 已把云函数解析好的直链写进 data/oss_links.csv）
   # 就紧接着同步，约 09:05 CST 开工。daily.yml 失败时不触发（也没新东西可传）。
