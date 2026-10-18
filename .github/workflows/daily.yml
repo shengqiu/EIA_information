@@ -1,8 +1,11 @@
 name: 每日采集并发布（北京时间 09:00）
 
-# 北京时间 09:00 = UTC 01:00
+# 2026-10-18 起主采集提前到北京时间 00:17（UTC 16:17），让 wuxi-leads 第 1 步（00:43 / 01:13）当晚就能读到湖州新公告、
+# 02:23 交给 Claude 分析、早上推送。原来的 09:00（UTC 01:00）保留为白天备用，防 GitHub 定时被丢。
+# 注意：workflow 名字里的「09:00」不能改——drive.yml 的 workflow_run 按名字触发。
 on:
   schedule:
+    - cron: '17 16 * * *'
     - cron: '0 1 * * *'
   workflow_dispatch:
 
