@@ -57,6 +57,9 @@ MIME = {".pdf": "application/pdf", ".doc": "application/msword",
 # ---------------------------------------------------------------- 判断 & 生成（同 wuxi-leads attach2doc.py）
 
 _CTRL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\ufffe\uffff]")
+# 关键表格页：扫描件里这些页除了 OCR 文字再插一张原页图，第 2 步只读 Drive 时能对照原图核对数字
+# （OCR 常把氩/氧、氮/氢认错）
+KEY_WORDS = re.compile(r"原辅材料|原辅料|原料及|主要设备|设备清单|设备一览|工程组成|燃料|能源消耗|能耗|储存设施|储罐")
 FIG_WORDS = re.compile(r"平面(布置)?图|布置图|流程图|示意图|位置图|四至图|周边(环境|关系)|附图|监测点位|厂区平面|照片|图\s*\d")
 FEW_CHARS, CAPTION_MAX = 250, 600
 OCR_PAGES, OCR_MAX_BYTES = 10, 1_900_000
@@ -98,7 +101,8 @@ def classify(data, scanned):
             text, rough = "", _rough_ocr(page)
             figure = True if rough is None else \
                 len(rough) < FEW_CHARS or (len(rough) < CAPTION_MAX and bool(FIG_WORDS.search(rough)))
-        pages.append({"no": i + 1, "text": text, "figure": figure})
+        key = scanned and not figure and bool(rough and KEY_WORDS.search(rough))
+        pages.append({"no": i + 1, "text": text, "figure": figure, "key": key})
     return pages
 
 
@@ -152,12 +156,17 @@ def build_docx(title, data, pages, ocr_parts=None, note=""):
                 add_figure(p["no"])
     else:
         figs = {p["no"] for p in pages if p["figure"]}
+        keys = {p["no"] for p in pages if p.get("key")}
         for a, b, text in ocr_parts:
             d.add_heading(f"第 {a}–{b} 页", level=2)
             add_text(text)
             for no in range(a, b + 1):
                 if no in figs:
                     add_figure(no)
+                elif no in keys:
+                    d.add_paragraph(f"【第 {no} 页 · 关键表格原图（核对 OCR 用）】")
+                    d.add_picture(io.BytesIO(src[no - 1].get_pixmap(dpi=150).tobytes("jpeg", jpg_quality=80)),
+                                  width=Cm(16))
     buf = io.BytesIO()
     d.save(buf)
     return buf.getvalue()
