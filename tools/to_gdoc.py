@@ -4,8 +4,11 @@
 
     湖州线索/<项目>/
       ├── 网页内容.txt                       ← to_drive.py（不变）
-      ├── 报告表.pdf                          ← to_drive.py（原文件，不变）
+      ├── 报告表.pdf                          ← to_drive.py 传的原文件；文档版生成成功后移到 Drive 回收站
       └── 报告表（文档版）                    ← 本脚本：Google 文档
+
+2026-10-19 起按 Frank 要求不保留附件原文件：文档版生成成功才删（进回收站，30 天可恢复）；
+转换失败的、转不了的（图片、表格等）原文件保留。只影响本脚本处理到的附件，之前的旧原文件不动。
 
 文档版的内容：
 - Word（.doc/.docx）：直接让 Google 转换，原文图片自动保留；
@@ -173,6 +176,12 @@ def rc(*args, timeout=900, check=True, input_bytes=None):
     raise RuntimeError(f"rclone {args[0]} 失败：{last[:200]}")
 
 
+def trash_raw(folder, name):
+    """删掉 to_drive.py 传上去的原文件（进 Drive 回收站）。返回是否删掉。"""
+    p = rc("deletefile", f"{folder}/{name}", check=False)
+    return p.returncode == 0
+
+
 def upload_as_gdoc(local, ext, dest_folder, name):
     """本地文件 → Google 文档（Drive 导入转换）。"""
     rc("copyto", local, f"{dest_folder}/{name}{ext}", "--drive-import-formats", ext.lstrip("."),
@@ -287,11 +296,13 @@ def main():
                     out_dir = os.path.join(work, "x")
                     os.makedirs(out_dir)
                     inner = extract_zip(local, out_dir) if sniff_archive_kind(local) == "zip" else extract_bsdtar(local, out_dir)
-                    items = [(os.path.join(out_dir, n), n) for n, _ in inner]
+                    # to_drive.py 用 rclone copy 上传解出的文件，Drive 上的名字就是解压时的安全名
+                    items = [(os.path.join(out_dir, n), n, n) for n, _ in inner]
                 else:
-                    items = [(local, f["filename"])]
+                    # to_drive.py 直接上传时，Drive 上的名字是 sanitize(文件名, 120)
+                    items = [(local, f["filename"], sanitize(f["filename"], 120))]
                 all_ok = True
-                for path, fname in items:
+                for path, fname, raw_name in items:
                     if not fname.lower().endswith(CONVERTIBLE):
                         continue
                     key = f"{src_key}#{fname}"
@@ -299,11 +310,12 @@ def main():
                         continue
                     try:
                         how = convert_one(path, fname, folder, work)
-                        st["done"][key] = {"project": name, "file": fname, "how": how,
+                        raw_gone = trash_raw(folder, raw_name)
+                        st["done"][key] = {"project": name, "file": fname, "how": how, "raw_trashed": raw_gone,
                                            "at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
                         st["failed"].pop(key, None)
                         converted += 1
-                        log(f"        ✓ {fname[:40]}{SUFFIX}：{how}")
+                        log(f"        ✓ {fname[:40]}{SUFFIX}：{how}；原文件{'已移到回收站' if raw_gone else '没找到（可能还没同步），未删'}")
                     except Exception as e:  # noqa: BLE001 — 单个失败下次重试
                         all_ok = False
                         failed += 1
