@@ -331,7 +331,7 @@ def do_archive(task, st, tmpdir, keep_temp=False):
 def main():
     ap = argparse.ArgumentParser(
         description="把环评项目按「湖州线索/<项目>/」扁平结构同步到 Google Drive")
-    ap.add_argument("--base", default="湖州线索", help="Drive 上的母文件夹名")
+    ap.add_argument("--base", default="湖州", help="Drive 上的母文件夹名")
     ap.add_argument("--limit", type=int, default=0,
                     help="本次最多处理几个任务（0=全部）")
     ap.add_argument("--project", default=None,

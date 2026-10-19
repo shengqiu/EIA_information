@@ -150,7 +150,7 @@ def save_state(st):
 
 def main():
     ap = argparse.ArgumentParser(description="给「湖州线索/<项目>/」里的附件生成 Google 文档版")
-    ap.add_argument("--base", default="湖州线索")
+    ap.add_argument("--base", default="湖州")
     ap.add_argument("--since", type=int, default=7, help="只处理最近几天有公告的项目（0=全部）")
     ap.add_argument("--project", default=None, help="只处理项目名含该关键词的")
     ap.add_argument("--limit", type=int, default=0, help="最多转几个文件（0=不限）")

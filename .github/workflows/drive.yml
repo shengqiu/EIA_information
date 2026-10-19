@@ -119,7 +119,8 @@ jobs:
       - name: 同步附件到 Drive
         env:
           RCLONE_CONFIG_GDRIVE_TYPE: drive
-        run: python3 tools/to_drive.py
+        # 2026-10-19 起统一放「销售线索/湖州/<项目名称>」（DRIVE_FOLDER_ID = 「销售线索」文件夹）
+        run: python3 tools/to_drive.py --base 湖州
 
       # 2026-10-19 新增：给附件生成「（文档版）」Google 文档（文字 + 平面图等图页；扫描件用 Google OCR），
       # 供 wuxi-leads 湖州线索的第 2 步 Claude 分析直接读。原文件和上面的同步都不受影响；这一步失败不影响整个 job。
@@ -139,7 +140,7 @@ jobs:
           GDOC_SINCE: ${{ inputs.gdoc_since }}
           GDOC_PROJECT: ${{ inputs.gdoc_project }}
         run: |
-          args=(--since "${GDOC_SINCE:-7}")
+          args=(--base 湖州 --since "${GDOC_SINCE:-7}")
           [ -n "$GDOC_PROJECT" ] && args+=(--project "$GDOC_PROJECT")
           python3 tools/to_gdoc.py "${args[@]}"
 
