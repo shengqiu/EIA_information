@@ -9,7 +9,7 @@
       └── 报告表                              ← 本脚本：附件转成的 Google 文档（与无锡统一，不带后缀）
 
 2026-10-19 起按 Frank 要求不保留附件原文件：文档版生成成功才删（进回收站，30 天可恢复）；
-转换失败的、转不了的（图片、表格等）原文件保留。只影响本脚本处理到的附件，之前的旧原文件不动。
+转换失败的、转不了的（图片、表格等）原文件保留——Drive 里没有原文件时补传一份，保证第 2 步有资料可读。只影响本脚本处理到的附件，之前的旧原文件不动。
 
 文档版的内容：
 - Word（.doc/.docx）：直接让 Google 转换，原文图片自动保留；
@@ -227,8 +227,12 @@ def main():
                     except Exception as e:  # noqa: BLE001 — 单个失败下次重试
                         all_ok = False
                         failed += 1
+                        # 转换失败：保证 Drive 里至少有原文件（wuxi-leads 第 2 步会直接读原文件分析）
+                        kept = rc("lsf", f"{folder}/{raw_name}", check=False).stdout.strip()
+                        if not kept:
+                            rc("copyto", path, f"{folder}/{raw_name}", check=False)
                         st["failed"][key] = {"project": name, "file": fname, "error": str(e)[:200]}
-                        log(f"        ✗ {fname[:40]}：{str(e)[:160]}")
+                        log(f"        ✗ {fname[:40]}：{str(e)[:160]}；原文件{'已在 Drive' if kept else '已补传到 Drive'}，第 2 步可直接读")
                     save_state(st)
                 if all_ok:
                     st["done"][src_key] = {"project": name, "file": f["filename"],
