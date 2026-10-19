@@ -4,8 +4,9 @@
 
     湖州线索/<项目>/
       ├── 网页内容.txt                       ← to_drive.py（不变）
+      ├── 公示原文                            ← 本脚本：网页内容.txt 的内容转成 Google 文档（与无锡统一）
       ├── 报告表.pdf                          ← to_drive.py 传的原文件；文档版生成成功后移到 Drive 回收站
-      └── 报告表（文档版）                    ← 本脚本：Google 文档
+      └── 报告表                              ← 本脚本：附件转成的 Google 文档（与无锡统一，不带后缀）
 
 2026-10-19 起按 Frank 要求不保留附件原文件：文档版生成成功才删（进回收站，30 天可恢复）；
 转换失败的、转不了的（图片、表格等）原文件保留。只影响本脚本处理到的附件，之前的旧原文件不动。
@@ -40,13 +41,14 @@ import time
 from datetime import datetime, timedelta, timezone
 
 import attach2doc  # 与 wuxi-leads 的 wuxi/attach2doc.py 逐字节相同：无锡、湖州用同一份 OCR / 转换逻辑
-from eia_common import (ARCHIVE_EXT, CST, build_projects, download, extract_bsdtar, extract_zip, load_announcements,
+from eia_common import (ARCHIVE_EXT, CST, build_projects, download, extract_bsdtar, extract_zip, load_announcements, render_text,
                         load_links, log, sanitize, sniff_archive_kind)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATE_PATH = os.path.join(ROOT, "data", "gdoc_state.json")
 REMOTE = "gdrive:"
-SUFFIX = "（文档版）"
+SUFFIX = ""          # 2026-10-19 起与无锡统一：附件 Google 文档就叫「<附件名>」（原文件转换后即删，不会同名）
+NOTICE_NAME = "公示原文"   # 与无锡统一：公告原文 Google 文档
 CONVERTIBLE = (".pdf", ".doc", ".docx")
 MIME = {".pdf": "application/pdf", ".doc": "application/msword",
         ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"}
@@ -161,10 +163,25 @@ def main():
     picked = {n: p for n, p in projects.items()
               if (not cutoff or (p["latest"] or "") >= cutoff) and (not a.project or a.project in n)}
     st = load_state()
+    notice_todo = [n for n in picked if f"notice|{n}" not in st["done"]]
     todo = [(n, f) for n, p in sorted(picked.items(), key=lambda x: x[1]["latest"] or "", reverse=True)
             for f in p["files"] if f"gdoc|{f['oss']}" not in st["done"]
             and f["filename"].lower().endswith(CONVERTIBLE + ARCHIVE_EXT)]
-    log(f"{len(picked)} 个项目（{'全部' if not cutoff else cutoff + ' 以来'}），待转附件 {len(todo)} 个")
+    log(f"{len(picked)} 个项目（{'全部' if not cutoff else cutoff + ' 以来'}），待转附件 {len(todo)} 个，待建公示原文 {len(notice_todo)} 个")
+    if not a.dry_run:
+        for n in notice_todo:
+            folder = f"{REMOTE}{sanitize(a.base)}/{sanitize(n)}"
+            try:
+                with tempfile.TemporaryDirectory() as t:
+                    path = os.path.join(t, "notice.txt")
+                    with open(path, "w", encoding="utf-8") as fh:
+                        fh.write(render_text(n, picked[n]))
+                    upload_as_gdoc(path, ".txt", folder, NOTICE_NAME)
+                st["done"][f"notice|{n}"] = {"project": n, "at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
+                log(f"  ✓ {n[:36]} › {NOTICE_NAME}")
+            except Exception as e:  # noqa: BLE001 — 下次重试
+                log(f"  ✗ {n[:36]} › {NOTICE_NAME}：{str(e)[:160]}")
+            save_state(st)
     if a.dry_run or not todo:
         for n, f in todo:
             log(f"  {n[:30]} › {f['filename'][:40]}")
@@ -206,7 +223,7 @@ def main():
                                            "at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
                         st["failed"].pop(key, None)
                         converted += 1
-                        log(f"        ✓ {fname[:40]}{SUFFIX}：{how}；原文件{'已移到回收站' if raw_gone else '没找到（可能还没同步），未删'}")
+                        log(f"        ✓ {fname[:40]} → Google 文档：{how}；原文件{'已移到回收站' if raw_gone else '没找到（可能还没同步），未删'}")
                     except Exception as e:  # noqa: BLE001 — 单个失败下次重试
                         all_ok = False
                         failed += 1
