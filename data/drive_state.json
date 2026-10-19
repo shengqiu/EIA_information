@@ -1,8 +1,8 @@
 {
  "failed": {
   "url|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/20267/c5a3df93565d4b7194244b1156c746dd.pdf?fileName=20260721%E5%85%AC%E7%A4%BA%E7%A8%BF--%E6%B5%99%E6%B1%9F%E6%B1%87%E9%9A%86%E6%96%B0%E6%9D%90%E6%96%99%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E5%B9%B4%E4%BA%A727%E4%B8%87%E5%90%A8%E7%BB%BF%E8%89%B2%E6%96%B0%E6%9D%90%E6%96%99%E5%8F%8A1000%E4%B8%87%E5%A5%97%E6%88%B7%E5%A4%96%E7%94%A8%E5%93%81%E6%95%B0%E5%AD%97%E5%8C%96%E5%B7%A5%E5%8E%82%E9%A1%B9%E7%9B%AE%E9%85%8D%E5%A5%97%E5%8F%8C%E5%9B%9E%E8%B7%AF%E4%BE%9B%E7%94%B5%E5%8F%98%E5%8E%8B%E7%B3%BB%E7%BB%9F%E9%A1%B9%E7%9B%AE%EF%BC%88%E5%85%AC%E7%A4%BA%E7%A8%BF%EF%BC%89.pdf": {
-   "at": "2026-10-19T08:49:57Z",
-   "error": "2026/10/19 08:50:40 NOTICE: Failed to copyurl: CopyURL failed: 403 Forbidden",
+   "at": "2026-10-19T21:09:39Z",
+   "error": "2026/10/19 21:09:51 NOTICE: Failed to copyurl: CopyURL failed: 403 Forbidden",
    "file": "20260721公示稿--浙江汇隆新材料股份有限公司年产27万吨绿色新材料及1000万套户外用品数字化工厂项目配套双回路供电变压系统项目（公示稿）.pdf"
   }
  },
@@ -13,6 +13,14 @@
    "file": "天荒坪浙江丞骏实业有限公司年产3000万套汽车零部件生产线项目生态环境影响报告表公示版.rar",
    "inner": [
     "天荒坪浙江丞骏实业有限公司年产3000万套汽车零部件生产线项目生态环境影响报告表公示版.pdf"
+   ]
+  },
+  "arc|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/07ea3777a34e465492abe2870e9ff4ea.rar?fileName=%E5%85%AC%E7%A4%BA--%E6%B5%99%E6%B1%9F%E6%97%B6%E4%BB%A3%E5%8C%85%E8%A3%85%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E5%B9%B4%E4%BA%A750%E4%B8%87%E5%8F%AA%E7%BA%B8%E6%A1%B6%E6%8A%80%E6%94%B9%E9%A1%B9%E7%9B%AE%E7%94%9F%E6%80%81%E7%8E%AF%E5%A2%83%E5%BD%B1%E5%93%8D%E6%8A%A5%E5%91%8A%E8%A1%A8.rar": {
+   "at": "2026-10-19T21:09:38Z",
+   "file": "公示--浙江时代包装有限公司年产50万只纸桶技改项目生态环境影响报告表.rar",
+   "inner": [
+    "公示--浙江时代包装有限公司年产50万只纸桶技改项目生态环境影响报告表.pdf",
+    "浙江时代包装有限公司年产50万只纸桶技改项目生态环境影响报告表（word格式，与所有附图附件打包）.doc"
    ]
   },
   "arc|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/0b5829e8f5dd426f8d68f3a55399781e.zip?fileName=%E4%B9%9D%E9%87%8C%E6%A1%A5%E6%B8%AF%E7%94%9F%E6%80%81%E4%BF%AE%E5%A4%8D%E5%92%8C%E6%B2%BF%E5%B2%B8%E9%81%93%E8%B7%AF%E6%99%AF%E8%A7%82%E6%8F%90%E5%8D%87%E5%B7%A5%E7%A8%8B.zip": {
@@ -99,11 +107,25 @@
     "安吉宏旭家居有限公司年产10万套家具塑料配件生产线项目生态环境影响报告表 公示版.pdf"
    ]
   },
+  "arc|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/8f543aa3fa394cff8e6ea7b5b03549d5.zip?fileName=%E5%85%AC%E7%A4%BA%E7%A8%BF-%E6%B5%99%E6%B1%9F%E5%A1%91%E5%8D%8E%E7%A7%91%E6%8A%80%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8.zip": {
+   "at": "2026-10-19T21:06:45Z",
+   "file": "公示稿-浙江塑华科技有限公司.zip",
+   "inner": [
+    "公示稿-浙江塑华科技有限公司.pdf"
+   ]
+  },
   "arc|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/96a73e9229994933b9ac2e1251acdc5a.zip?fileName=%E5%AE%89%E5%90%89%E5%A4%A9%E9%B9%8F%E7%AB%B9%E6%9C%A8%E4%B8%9A%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E5%B9%B4%E4%BA%A7120%E4%B8%87%E5%B9%B3%E7%B1%B3%E6%88%B7%E5%A4%96%E9%87%8D%E7%BB%84%E7%AB%B9%E5%9C%B0%E6%9D%BF%E5%8F%8A%E7%AB%B9%E5%A4%8D%E5%90%88%E6%96%B0%E6%9D%90%E6%96%99%E9%A1%B9%E7%9B%AE%EF%BC%88%E5%85%AC%E7%A4%BA%E7%89%88%EF%BC%89.zip": {
    "at": "2026-10-16T01:06:46Z",
    "file": "安吉天鹏竹木业有限公司年产120万平米户外重组竹地板及竹复合新材料项目（公示版）.zip",
    "inner": [
     "安吉天鹏竹木业有限公司年产120万平米户外重组竹地板及竹复合新材料项目-公示版.pdf"
+   ]
+  },
+  "arc|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/b354b2898a284f33b7ca138f8fdee6ee.rar?fileName=%E8%83%9C%E5%8F%91%E9%87%91%E5%B1%9E%EF%BC%88%E5%85%AC%E7%A4%BA%E7%89%88%EF%BC%89.rar": {
+   "at": "2026-10-19T21:08:34Z",
+   "file": "胜发金属（公示版）.rar",
+   "inner": [
+    "胜发金属（公示版）.pdf"
    ]
   },
   "arc|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/b473ba576afd47328d06963761a531eb.rar?fileName=%E5%85%AC%E7%A4%BA%E7%A8%BF-%E6%B5%99%E6%B1%9F%E7%BF%83%E8%BE%BE%E6%99%BA%E8%83%BD%E8%A3%85%E5%A4%87%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E9%AB%98%E7%AB%AF%E6%99%BA%E8%83%BD%E9%92%8E%E7%84%8A%E7%82%89%E7%83%AD%E5%A4%84%E7%90%86%E8%AE%BE%E5%A4%87%E9%A1%B9%E7%9B%AE_%E5%B7%B2%E6%A0%87%E8%AE%B0%E5%AF%86%E6%96%87.rar": {
@@ -133,6 +155,13 @@
    "file": "报告表--尊马智造（湖州）科技有限公司建设项目--公示稿.rar",
    "inner": [
     "1.报告表--尊马智造（湖州）科技有限公司建设项目--公示稿(1).pdf"
+   ]
+  },
+  "arc|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/ca049a37108142db973d5fbc9d01d960.rar?fileName=%E5%85%AC%E7%A4%BA--%E6%B9%96%E5%B7%9E%E7%89%B9%E7%91%9E%E6%96%B0%E6%9D%90%E6%96%99%E7%A7%91%E6%8A%80%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E6%96%B0%E5%A2%9E%E5%B9%B4%E4%BA%A75%E4%B8%87%E5%A5%97%E6%B7%8B%E6%B5%B4%E6%88%BF%E5%BA%95%E7%9B%86%E9%A1%B9%E7%9B%AE%E7%94%9F%E6%80%81%E7%8E%AF%E5%A2%83%E5%BD%B1%E5%93%8D%E6%8A%A5%E5%91%8A%E8%A1%A8.rar": {
+   "at": "2026-10-19T21:07:35Z",
+   "file": "公示--湖州特瑞新材料科技有限公司新增年产5万套淋浴房底盆项目生态环境影响报告表.rar",
+   "inner": [
+    "（脱敏稿）湖州特瑞新材料科技有限公司新增年产5万套淋浴房底盆项目生态环境影响报告表.pdf"
    ]
   },
   "arc|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/cda67a16bc464b5fae5f28968f1aa6ed.zip?fileName=%E9%9D%92%E5%B2%91%E7%94%9F%E7%89%A9%E5%8C%BB%E8%8D%AF%EF%BC%88%E6%B5%99%E6%B1%9F%EF%BC%89%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E5%B9%B4%E4%BA%A7200%E4%B8%87%E7%9B%92DAP%E9%9D%92%E9%9C%89%E7%B4%A0%E7%9A%AE%E8%AF%95%E8%AF%95%E5%89%82%E7%9B%92%E3%80%81200%E4%B8%87%E7%93%B6WP1403%E6%B3%A8%E5%B0%84%E6%B6%B2%E5%BB%BA%E8%AE%BE%E9%A1%B9%E7%9B%AE%E7%8E%AF%E8%AF%84%E6%8A%A5%E5%91%8A%E8%A1%A8-%E5%85%AC%E7%A4%BA%E7%89%88.zip": {
@@ -584,6 +613,18 @@
    "file": "天荒坪浙江丞骏实业有限公司年产3000万套汽车零部件生产线项目生态环境影响报告表公示版.pdf",
    "size": 3918618
   },
+  "file|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/07ea3777a34e465492abe2870e9ff4ea.rar?fileName=%E5%85%AC%E7%A4%BA--%E6%B5%99%E6%B1%9F%E6%97%B6%E4%BB%A3%E5%8C%85%E8%A3%85%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E5%B9%B4%E4%BA%A750%E4%B8%87%E5%8F%AA%E7%BA%B8%E6%A1%B6%E6%8A%80%E6%94%B9%E9%A1%B9%E7%9B%AE%E7%94%9F%E6%80%81%E7%8E%AF%E5%A2%83%E5%BD%B1%E5%93%8D%E6%8A%A5%E5%91%8A%E8%A1%A8.rar#公示--浙江时代包装有限公司年产50万只纸桶技改项目生态环境影响报告表.pdf": {
+   "at": "2026-10-19T21:09:33Z",
+   "dest": "gdrive:湖州/年产50万只纸桶技改项目/公示--浙江时代包装有限公司年产50万只纸桶技改项目生态环境影响报告表.pdf",
+   "file": "公示--浙江时代包装有限公司年产50万只纸桶技改项目生态环境影响报告表.pdf",
+   "size": 10595722
+  },
+  "file|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/07ea3777a34e465492abe2870e9ff4ea.rar?fileName=%E5%85%AC%E7%A4%BA--%E6%B5%99%E6%B1%9F%E6%97%B6%E4%BB%A3%E5%8C%85%E8%A3%85%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E5%B9%B4%E4%BA%A750%E4%B8%87%E5%8F%AA%E7%BA%B8%E6%A1%B6%E6%8A%80%E6%94%B9%E9%A1%B9%E7%9B%AE%E7%94%9F%E6%80%81%E7%8E%AF%E5%A2%83%E5%BD%B1%E5%93%8D%E6%8A%A5%E5%91%8A%E8%A1%A8.rar#浙江时代包装有限公司年产50万只纸桶技改项目生态环境影响报告表（word格式，与所有附图附件打包）.doc": {
+   "at": "2026-10-19T21:09:38Z",
+   "dest": "gdrive:湖州/年产50万只纸桶技改项目/浙江时代包装有限公司年产50万只纸桶技改项目生态环境影响报告表（word格式，与所有附图附件打包）.doc",
+   "file": "浙江时代包装有限公司年产50万只纸桶技改项目生态环境影响报告表（word格式，与所有附图附件打包）.doc",
+   "size": 124349532
+  },
   "file|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/0b5829e8f5dd426f8d68f3a55399781e.zip?fileName=%E4%B9%9D%E9%87%8C%E6%A1%A5%E6%B8%AF%E7%94%9F%E6%80%81%E4%BF%AE%E5%A4%8D%E5%92%8C%E6%B2%BF%E5%B2%B8%E9%81%93%E8%B7%AF%E6%99%AF%E8%A7%82%E6%8F%90%E5%8D%87%E5%B7%A5%E7%A8%8B.zip#九里桥港生态修复和沿岸道路景观提升工程.pdf": {
    "at": "2026-10-16T01:04:33Z",
    "dest": "gdrive:湖州线索/南浔生态宜居排水系统改造工程 - 九里桥港生态修复和沿岸道路景观提升工程/九里桥港生态修复和沿岸道路景观提升工程.pdf",
@@ -656,11 +697,23 @@
    "file": "安吉宏旭家居有限公司年产10万套家具塑料配件生产线项目生态环境影响报告表 公示版.pdf",
    "size": 6427024
   },
+  "file|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/8f543aa3fa394cff8e6ea7b5b03549d5.zip?fileName=%E5%85%AC%E7%A4%BA%E7%A8%BF-%E6%B5%99%E6%B1%9F%E5%A1%91%E5%8D%8E%E7%A7%91%E6%8A%80%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8.zip#公示稿-浙江塑华科技有限公司.pdf": {
+   "at": "2026-10-19T21:06:45Z",
+   "dest": "gdrive:湖州/浙江塑华科技有限公司年产450万平方塑木耐火复合材料 项目/公示稿-浙江塑华科技有限公司.pdf",
+   "file": "公示稿-浙江塑华科技有限公司.pdf",
+   "size": 13099578
+  },
   "file|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/96a73e9229994933b9ac2e1251acdc5a.zip?fileName=%E5%AE%89%E5%90%89%E5%A4%A9%E9%B9%8F%E7%AB%B9%E6%9C%A8%E4%B8%9A%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E5%B9%B4%E4%BA%A7120%E4%B8%87%E5%B9%B3%E7%B1%B3%E6%88%B7%E5%A4%96%E9%87%8D%E7%BB%84%E7%AB%B9%E5%9C%B0%E6%9D%BF%E5%8F%8A%E7%AB%B9%E5%A4%8D%E5%90%88%E6%96%B0%E6%9D%90%E6%96%99%E9%A1%B9%E7%9B%AE%EF%BC%88%E5%85%AC%E7%A4%BA%E7%89%88%EF%BC%89.zip#安吉天鹏竹木业有限公司年产120万平米户外重组竹地板及竹复合新材料项目-公示版.pdf": {
    "at": "2026-10-16T01:06:46Z",
    "dest": "gdrive:湖州线索/年产120万平米户外重组竹地板及竹复合新材料项目/安吉天鹏竹木业有限公司年产120万平米户外重组竹地板及竹复合新材料项目-公示版.pdf",
    "file": "安吉天鹏竹木业有限公司年产120万平米户外重组竹地板及竹复合新材料项目-公示版.pdf",
    "size": 13469510
+  },
+  "file|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/b354b2898a284f33b7ca138f8fdee6ee.rar?fileName=%E8%83%9C%E5%8F%91%E9%87%91%E5%B1%9E%EF%BC%88%E5%85%AC%E7%A4%BA%E7%89%88%EF%BC%89.rar#胜发金属（公示版）.pdf": {
+   "at": "2026-10-19T21:08:34Z",
+   "dest": "gdrive:湖州/年产5万套除湿机外壳项目/胜发金属（公示版）.pdf",
+   "file": "胜发金属（公示版）.pdf",
+   "size": 2929468
   },
   "file|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/b473ba576afd47328d06963761a531eb.rar?fileName=%E5%85%AC%E7%A4%BA%E7%A8%BF-%E6%B5%99%E6%B1%9F%E7%BF%83%E8%BE%BE%E6%99%BA%E8%83%BD%E8%A3%85%E5%A4%87%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E9%AB%98%E7%AB%AF%E6%99%BA%E8%83%BD%E9%92%8E%E7%84%8A%E7%82%89%E7%83%AD%E5%A4%84%E7%90%86%E8%AE%BE%E5%A4%87%E9%A1%B9%E7%9B%AE_%E5%B7%B2%E6%A0%87%E8%AE%B0%E5%AF%86%E6%96%87.rar#公示稿-浙江翃达智能装备有限公司高端智能钎焊炉热处理设备项目_已标记密文.pdf": {
    "at": "2026-10-16T01:10:40Z",
@@ -691,6 +744,12 @@
    "dest": "gdrive:湖州线索/年产不锈钢特种钢用焊接材料4500吨、超级奥氏体耐蚀不锈钢3000吨建设项目/1.报告表--尊马智造（湖州）科技有限公司建设项目--公示稿(1).pdf",
    "file": "1.报告表--尊马智造（湖州）科技有限公司建设项目--公示稿(1).pdf",
    "size": 25043572
+  },
+  "file|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/ca049a37108142db973d5fbc9d01d960.rar?fileName=%E5%85%AC%E7%A4%BA--%E6%B9%96%E5%B7%9E%E7%89%B9%E7%91%9E%E6%96%B0%E6%9D%90%E6%96%99%E7%A7%91%E6%8A%80%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E6%96%B0%E5%A2%9E%E5%B9%B4%E4%BA%A75%E4%B8%87%E5%A5%97%E6%B7%8B%E6%B5%B4%E6%88%BF%E5%BA%95%E7%9B%86%E9%A1%B9%E7%9B%AE%E7%94%9F%E6%80%81%E7%8E%AF%E5%A2%83%E5%BD%B1%E5%93%8D%E6%8A%A5%E5%91%8A%E8%A1%A8.rar#（脱敏稿）湖州特瑞新材料科技有限公司新增年产5万套淋浴房底盆项目生态环境影响报告表.pdf": {
+   "at": "2026-10-19T21:07:35Z",
+   "dest": "gdrive:湖州/新增年产5万套淋浴房底盆项目/（脱敏稿）湖州特瑞新材料科技有限公司新增年产5万套淋浴房底盆项目生态环境影响报告表.pdf",
+   "file": "（脱敏稿）湖州特瑞新材料科技有限公司新增年产5万套淋浴房底盆项目生态环境影响报告表.pdf",
+   "size": 9788796
   },
   "file|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/cda67a16bc464b5fae5f28968f1aa6ed.zip?fileName=%E9%9D%92%E5%B2%91%E7%94%9F%E7%89%A9%E5%8C%BB%E8%8D%AF%EF%BC%88%E6%B5%99%E6%B1%9F%EF%BC%89%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E5%B9%B4%E4%BA%A7200%E4%B8%87%E7%9B%92DAP%E9%9D%92%E9%9C%89%E7%B4%A0%E7%9A%AE%E8%AF%95%E8%AF%95%E5%89%82%E7%9B%92%E3%80%81200%E4%B8%87%E7%93%B6WP1403%E6%B3%A8%E5%B0%84%E6%B6%B2%E5%BB%BA%E8%AE%BE%E9%A1%B9%E7%9B%AE%E7%8E%AF%E8%AF%84%E6%8A%A5%E5%91%8A%E8%A1%A8-%E5%85%AC%E7%A4%BA%E7%89%88.zip#青岑生物医药（浙江）有限公司年产200万盒DAP青霉素皮试试剂盒、200万瓶WP1403注射液建设项目环评报告表-公示版.pdf": {
    "at": "2026-10-16T01:06:32Z",
@@ -1364,17 +1423,35 @@
    "file": "网页内容.txt",
    "size": 3627
   },
+  "text|年产50万只纸桶技改项目": {
+   "at": "2026-10-19T21:08:34Z",
+   "dest": "gdrive:湖州/年产50万只纸桶技改项目/网页内容.txt",
+   "file": "网页内容.txt",
+   "size": 1895
+  },
   "text|年产50万颗P2级高端数控机床主轴 轴承、40万颗精密机器人轴承、280万颗新能源汽车轴承、80万颗真空泵轴承自 动化产线项目": {
    "at": "2026-10-16T01:53:34Z",
    "dest": "gdrive:湖州线索/年产50万颗P2级高端数控机床主轴 轴承、40万颗精密机器人轴承、280万颗新能源汽车轴承、80万颗真空泵轴承自 动化产线项目/网页内容.txt",
    "file": "网页内容.txt",
    "size": 2011
   },
+  "text|年产5万套除湿机外壳项目": {
+   "at": "2026-10-19T21:07:50Z",
+   "dest": "gdrive:湖州/年产5万套除湿机外壳项目/网页内容.txt",
+   "file": "网页内容.txt",
+   "size": 1847
+  },
   "text|年产7000套整木家居项目（苏心）、年产8000套整木家居项目（艺居）、年产6000套整木家居项目（豪匠）、年产5000套智能整木家居项目（怡辉）": {
    "at": "2026-10-16T01:44:09Z",
    "dest": "gdrive:湖州线索/年产7000套整木家居项目（苏心）、年产8000套整木家居项目（艺居）、年产6000套整木家居项目（豪匠）、年产5000套智能整木家居项目（怡辉）/网页内容.txt",
    "file": "网页内容.txt",
    "size": 2011
+  },
+  "text|年产750万台服务机器人智能制造项目": {
+   "at": "2026-10-19T21:07:35Z",
+   "dest": "gdrive:湖州/年产750万台服务机器人智能制造项目/网页内容.txt",
+   "file": "网页内容.txt",
+   "size": 1760
   },
   "text|年产7838万件铅酸电池配套塑料件注塑生产项目": {
    "at": "2026-10-16T01:52:43Z",
@@ -1466,6 +1543,12 @@
    "file": "网页内容.txt",
    "size": 3838
   },
+  "text|新增年产5万套淋浴房底盆项目": {
+   "at": "2026-10-19T21:06:45Z",
+   "dest": "gdrive:湖州/新增年产5万套淋浴房底盆项目/网页内容.txt",
+   "file": "网页内容.txt",
+   "size": 1941
+  },
   "text|智能鼓式制动系统建设项目": {
    "at": "2026-10-16T01:12:44Z",
    "dest": "gdrive:湖州线索/智能鼓式制动系统建设项目/网页内容.txt",
@@ -1495,6 +1578,12 @@
    "dest": "gdrive:湖州线索/浙江吉沃工业科技有限公司新增年产360万件新能源汽车零部件项目/网页内容.txt",
    "file": "网页内容.txt",
    "size": 3757
+  },
+  "text|浙江塑华科技有限公司年产450万平方塑木耐火复合材料 项目": {
+   "at": "2026-10-19T21:06:32Z",
+   "dest": "gdrive:湖州/浙江塑华科技有限公司年产450万平方塑木耐火复合材料 项目/网页内容.txt",
+   "file": "网页内容.txt",
+   "size": 1849
   },
   "text|浙江天济新材料科技有限公司年产9000吨全降解塑料袋搬迁项目": {
    "at": "2026-10-16T00:58:45Z",
@@ -1747,6 +1836,12 @@
    "dest": "gdrive:湖州线索/浙能长电迁建 -220kV 西子西扬输电线路改迁（和平镇）项目/浙能长电迁建-220kV西子西扬输电线路改迁（和平镇）项目环境影响报告表（公示稿）.pdf",
    "file": "浙能长电迁建-220kV西子西扬输电线路改迁（和平镇）项目环境影响报告表（公示稿）.pdf",
    "size": 3145728
+  },
+  "url|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/ddb22173ce334448978667dfe8248e46.pdf?fileName=%E7%BF%8E%E9%BC%8E.pdf": {
+   "at": "2026-10-19T21:07:37Z",
+   "dest": "gdrive:湖州/年产750万台服务机器人智能制造项目/翎鼎.pdf",
+   "file": "翎鼎.pdf",
+   "size": 637747
   },
   "url|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/20264/0568730e89d845a2bef8dc207ad2efbd.pdf?fileName=%EF%BC%88%E5%85%AC%E7%A4%BA%E7%A8%BF%EF%BC%89BG-ZFFB25220161%E6%B9%96%E5%B7%9E%E5%8D%97%E6%B5%94%E6%96%B0%E7%BD%97110%E5%8D%83%E4%BC%8F%E8%BE%93%E5%8F%98%E7%94%B5%E5%B7%A5%E7%A8%8B%E7%8E%AF%E5%A2%83%E5%BD%B1%E5%93%8D%E6%8A%A5%E5%91%8A%EF%BC%88%E6%8A%A5%E6%89%B9%E7%A8%BF%29.pdf": {
    "at": "2026-10-16T02:12:54Z",
