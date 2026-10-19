@@ -56,6 +56,7 @@ MIME = {".pdf": "application/pdf", ".doc": "application/msword",
 
 # ---------------------------------------------------------------- 判断 & 生成（同 wuxi-leads attach2doc.py）
 
+_CTRL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\ufffe\uffff]")
 FIG_WORDS = re.compile(r"平面(布置)?图|布置图|流程图|示意图|位置图|四至图|周边(环境|关系)|附图|监测点位|厂区平面|照片|图\s*\d")
 FEW_CHARS, CAPTION_MAX = 250, 600
 OCR_PAGES, OCR_MAX_BYTES = 10, 1_900_000
@@ -133,6 +134,8 @@ def build_docx(title, data, pages, ocr_parts=None, note=""):
         d.add_paragraph(note).runs[0].italic = True
 
     def add_text(text):
+        # PDF 文字层里偶尔夹着控制字符，Word（XML）不接受，先去掉（2026-10-19 青岑生物医药的报告表遇到）
+        text = _CTRL.sub("", text)
         for line in text.splitlines():
             if line.strip():
                 d.add_paragraph(line.strip())
