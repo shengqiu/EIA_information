@@ -16,7 +16,7 @@
 - 扫描版 PDF：Google OCR 文字（分段 ≤10 页、≤2MB 交给 Google 转换识别，绕开它的 OCR 限制）+ 图页整页插图。
 其他文件（图片、表格等）不转。
 
-逻辑与 shengqiu/wuxi-leads 的 wuxi/attach2doc.py、wuxi/leaddoc.py 一致（2026-10-18 在那边用真实附件测过：
+判断 / OCR 分段 / 生成 Word 用 tools/attach2doc.py——与 shengqiu/wuxi-leads 的 wuxi/attach2doc.py 是同一份文件（2026-10-18 在那边用真实附件测过：
 157 页文字版、80 页扫描件、367 页报告书都正常）。wuxi-leads 的第 1 步 / 第 2 步会直接读这里的文档版。
 
 断点续跑：data/gdoc_state.json 按源文件记账（gdoc|<OSS 直链>#<压缩包内文件名>），转过的跳过。
@@ -39,10 +39,7 @@ import tempfile
 import time
 from datetime import datetime, timedelta, timezone
 
-import pymupdf
-from docx import Document
-from docx.shared import Cm, Pt
-
+import attach2doc  # 与 wuxi-leads 的 wuxi/attach2doc.py 逐字节相同：无锡、湖州用同一份 OCR / 转换逻辑
 from eia_common import (ARCHIVE_EXT, CST, build_projects, download, extract_bsdtar, extract_zip, load_announcements,
                         load_links, log, sanitize, sniff_archive_kind)
 
@@ -53,124 +50,6 @@ SUFFIX = "（文档版）"
 CONVERTIBLE = (".pdf", ".doc", ".docx")
 MIME = {".pdf": "application/pdf", ".doc": "application/msword",
         ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"}
-
-# ---------------------------------------------------------------- 判断 & 生成（同 wuxi-leads attach2doc.py）
-
-_CTRL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\ufffe\uffff]")
-# 关键表格页：扫描件里这些页除了 OCR 文字再插一张原页图，第 2 步只读 Drive 时能对照原图核对数字
-# （OCR 常把氩/氧、氮/氢认错）
-KEY_WORDS = re.compile(r"原辅材料|原辅料|原料及|主要设备|设备清单|设备一览|工程组成|燃料|能源消耗|能耗|储存设施|储罐")
-FIG_WORDS = re.compile(r"平面(布置)?图|布置图|流程图|示意图|位置图|四至图|周边(环境|关系)|附图|监测点位|厂区平面|照片|图\s*\d")
-FEW_CHARS, CAPTION_MAX = 250, 600
-OCR_PAGES, OCR_MAX_BYTES = 10, 1_900_000
-OCR_NOTE = ("本文档由扫描件自动生成：文字是 Google OCR 识别结果，仅供检索和快速浏览，中文 OCR 会有错字"
-            "（如「氩/氧」「氮/氢」），数字以原件为准；平面图、流程图等图页按原样插入。")
-
-
-def is_scanned(data, pages=10, min_chars=50):
-    try:
-        doc = pymupdf.open(stream=data, filetype="pdf")
-        n = min(len(doc), pages)
-        return n == 0 or sum(len(doc[i].get_text().strip()) for i in range(n)) / n < min_chars
-    except Exception:
-        return True
-
-
-def _rough_ocr(page):
-    if not shutil.which("tesseract"):
-        return None
-    png = page.get_pixmap(dpi=90, colorspace=pymupdf.csGRAY).tobytes("png")
-    p = subprocess.run(["tesseract", "stdin", "stdout", "-l", "chi_sim", "--psm", "3"],
-                       input=png, capture_output=True, timeout=120)
-    return re.sub(r"\s+", "", p.stdout.decode("utf-8", "ignore"))
-
-
-def classify(data, scanned):
-    doc = pymupdf.open(stream=data, filetype="pdf")
-    pages = []
-    for i, page in enumerate(doc):
-        area = page.rect.width * page.rect.height or 1
-        if not scanned:
-            text = page.get_text().strip()
-            img_area = sum(r.width * r.height for img in page.get_images(full=True)
-                           for r in page.get_image_rects(img[0]))
-            dense = len(re.sub(r"\s+", "", text))
-            figure = dense < FEW_CHARS or img_area / area > 0.5 or len(page.get_drawings()) > 300 \
-                or (dense < CAPTION_MAX and bool(FIG_WORDS.search(text)))
-        else:
-            text, rough = "", _rough_ocr(page)
-            figure = True if rough is None else \
-                len(rough) < FEW_CHARS or (len(rough) < CAPTION_MAX and bool(FIG_WORDS.search(rough)))
-        key = scanned and not figure and bool(rough and KEY_WORDS.search(rough))
-        pages.append({"no": i + 1, "text": text, "figure": figure, "key": key})
-    return pages
-
-
-def ocr_chunks(data):
-    src = pymupdf.open(stream=data, filetype="pdf")
-    out, start = [], 0
-    while start < len(src):
-        n = min(OCR_PAGES, len(src) - start)
-        for dpi, quality in ((150, 70), (120, 60), (100, 50), (80, 45)):
-            doc = pymupdf.open()
-            for i in range(start, start + n):
-                page = src[i]
-                pix = page.get_pixmap(dpi=dpi, colorspace=pymupdf.csGRAY)
-                new = doc.new_page(width=page.rect.width, height=page.rect.height)
-                new.insert_image(new.rect, stream=pix.tobytes("jpeg", jpg_quality=quality))
-            buf = doc.tobytes(garbage=3, deflate=True)
-            if len(buf) <= OCR_MAX_BYTES:
-                break
-        if len(buf) > OCR_MAX_BYTES and n > 1:
-            n = max(1, n // 2)
-            continue
-        out.append((start + 1, start + n, buf))
-        start += n
-    return out
-
-
-def build_docx(title, data, pages, ocr_parts=None, note=""):
-    src = pymupdf.open(stream=data, filetype="pdf")
-    d = Document()
-    d.styles["Normal"].font.size = Pt(10.5)
-    d.add_heading(title, level=1)
-    if note:
-        d.add_paragraph(note).runs[0].italic = True
-
-    def add_text(text):
-        # PDF 文字层里偶尔夹着控制字符，Word（XML）不接受，先去掉（2026-10-19 青岑生物医药的报告表遇到）
-        text = _CTRL.sub("", text)
-        for line in text.splitlines():
-            if line.strip():
-                d.add_paragraph(line.strip())
-
-    def add_figure(no):
-        d.add_paragraph(f"【第 {no} 页 · 图】")
-        d.add_picture(io.BytesIO(src[no - 1].get_pixmap(dpi=130).tobytes("jpeg", jpg_quality=75)), width=Cm(16))
-
-    if ocr_parts is None:
-        for p in pages:
-            d.add_paragraph(f"—— 第 {p['no']} 页 ——").runs[0].bold = True
-            add_text(p["text"])
-            if p["figure"]:
-                add_figure(p["no"])
-    else:
-        figs = {p["no"] for p in pages if p["figure"]}
-        keys = {p["no"] for p in pages if p.get("key")}
-        for a, b, text in ocr_parts:
-            d.add_heading(f"第 {a}–{b} 页", level=2)
-            add_text(text)
-            for no in range(a, b + 1):
-                if no in figs:
-                    add_figure(no)
-                elif no in keys:
-                    d.add_paragraph(f"【第 {no} 页 · 关键表格原图（核对 OCR 用）】")
-                    d.add_picture(io.BytesIO(src[no - 1].get_pixmap(dpi=150).tobytes("jpeg", jpg_quality=80)),
-                                  width=Cm(16))
-    buf = io.BytesIO()
-    d.save(buf)
-    return buf.getvalue()
-
 
 # ---------------------------------------------------------------- rclone
 
@@ -204,7 +83,7 @@ def google_ocr(data, tmp_local, tmp_remote):
     """扫描版 PDF 分段交给 Google 转换（自动 OCR），返回 [(起页, 止页, 文字)]。"""
     parts = []
     try:
-        for a, b, chunk in ocr_chunks(data):
+        for a, b, chunk in attach2doc.ocr_chunks(data):
             name = f"p{a:04d}"
             path = os.path.join(tmp_local, name + ".pdf")
             with open(path, "wb") as fh:
@@ -235,15 +114,15 @@ def convert_one(path, name, folder, tmp_local):
         return "Word 原样转换"
     with open(path, "rb") as fh:
         data = fh.read()
-    scanned = is_scanned(data)
-    pages = classify(data, scanned)
+    scanned = attach2doc.is_scanned_pdf(data)
+    pages = attach2doc.classify(data, scanned)
     figs = sum(p["figure"] for p in pages)
     if scanned:
         parts = google_ocr(data, tmp_local, f"{folder}/_ocr_tmp")
-        doc = build_docx(stem, data, pages, parts, note=OCR_NOTE)
+        doc = attach2doc.build_docx(stem, data, pages, parts, note=attach2doc.OCR_NOTE)
         how = f"扫描件：OCR 文字 + {figs} 张图页，共 {len(pages)} 页"
     else:
-        doc = build_docx(stem, data, pages)
+        doc = attach2doc.build_docx(stem, data, pages)
         how = f"文字版：原文文字 + {figs} 张图页，共 {len(pages)} 页"
     out = os.path.join(tmp_local, "doc.docx")
     with open(out, "wb") as fh:
