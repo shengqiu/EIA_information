@@ -124,12 +124,14 @@ jobs:
       # 2026-10-19 新增：给附件生成「（文档版）」Google 文档（文字 + 平面图等图页；扫描件用 Google OCR），
       # 供 wuxi-leads 湖州线索的第 2 步 Claude 分析直接读。原文件和上面的同步都不受影响；这一步失败不影响整个 job。
       - name: 装转换依赖（PyMuPDF、python-docx、中文 tesseract）
+        if: ${{ !cancelled() }}   # 上一步常因个别失效直链报失败，文档版照样要做
         continue-on-error: true
         run: |
           sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-chi-sim >/dev/null
           pip install -q pymupdf python-docx
 
       - name: 生成 Google 文档版
+        if: ${{ !cancelled() }}
         continue-on-error: true
         timeout-minutes: 150
         env:
