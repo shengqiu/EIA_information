@@ -36,6 +36,7 @@ on:
     paths:
       - 'tools/to_drive.py'
       - 'tools/eia_common.py'   # 共享层：改了它 to_drive 行为可能变，一起验证
+      - 'tools/to_gdoc.py'
       - '.github/workflows/drive.yml'
   # 主触发：每日采集跑完（daily.yml 已把云函数解析好的直链写进 data/oss_links.csv）
   # 就紧接着同步，约 09:05 CST 开工。daily.yml 失败时不触发（也没新东西可传）。
@@ -45,6 +46,14 @@ on:
   schedule:
     - cron: '30 2 * * *'   # 兜底：每天 10:30 CST。有 state 去重，重复跑几乎空转
   workflow_dispatch:
+    inputs:
+      gdoc_since:
+        description: '文档版：只处理最近几天有公告的项目（0=全部，默认 7）'
+        required: false
+        default: '7'
+      gdoc_project:
+        description: '文档版：只处理项目名含该关键词的（调试用）'
+        required: false
 
 permissions:
   contents: write          # 回写 data/drive_state.json 需要
@@ -112,13 +121,33 @@ jobs:
           RCLONE_CONFIG_GDRIVE_TYPE: drive
         run: python3 tools/to_drive.py
 
+      # 2026-10-19 新增：给附件生成「（文档版）」Google 文档（文字 + 平面图等图页；扫描件用 Google OCR），
+      # 供 wuxi-leads 湖州线索的第 2 步 Claude 分析直接读。原文件和上面的同步都不受影响；这一步失败不影响整个 job。
+      - name: 装转换依赖（PyMuPDF、python-docx、中文 tesseract）
+        continue-on-error: true
+        run: |
+          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-chi-sim >/dev/null
+          pip install -q pymupdf python-docx
+
+      - name: 生成 Google 文档版
+        continue-on-error: true
+        timeout-minutes: 150
+        env:
+          RCLONE_CONFIG_GDRIVE_TYPE: drive
+          GDOC_SINCE: ${{ inputs.gdoc_since }}
+          GDOC_PROJECT: ${{ inputs.gdoc_project }}
+        run: |
+          args=(--since "${GDOC_SINCE:-7}")
+          [ -n "$GDOC_PROJECT" ] && args+=(--project "$GDOC_PROJECT")
+          python3 tools/to_gdoc.py "${args[@]}"
+
       # Actions 无状态，必须把 drive_state.json 提交回去，下次才不会重传
       - name: 回写同步状态
         if: always()
         run: |
           git config user.name  'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git add data/drive_state.json
+          git add data/drive_state.json data/gdoc_state.json 2>/dev/null || git add data/drive_state.json
           if git diff --cached --quiet; then
             echo '::notice::无变化（没有新传文件）'
           else
