@@ -108,7 +108,7 @@ Run workflow 即可，每次 1 封、默认只发链接。
 | # | Action | 文件 | 触发条件 | 一句话职责 |
 |---|---|---|---|---|
 | 1 | 部署采集云函数 | `.github/workflows/deploy-scf.yml` | push `cloud/**`、手动 | 把境内采集器打包部署到腾讯云 SCF 并冒烟测试 |
-| 2 | 每日采集并发布 | `.github/workflows/daily.yml` | 每天 09:00（CST）、手动 | 调云函数采新公告 → 渲染看板 → 提交 → 发布 Pages |
+| 2 | 每日采集并发布 | `.github/workflows/daily.yml` | 每天 00:17 & 09:00（CST）、手动 | 调云函数采新公告 → 渲染看板 → 提交 → 发布 Pages |
 | 3 | 发布看板到 Pages | `.github/workflows/pages.yml` | push `reports/**`、`data/**`、手动 | 只发布不采集；境内手动推数据后的自动发布通道 |
 | 4 | 附件同步 Google Drive | `.github/workflows/drive.yml` | Action 2 成功后、每天 10:30、push 脚本、手动 | 把附件按「项目」解压送进 Google Drive |
 | 5 | 按项目发邮件 | `.github/workflows/mail.yml` | 仅手动 | 一个项目一封邮件，默认只发链接 |
@@ -288,9 +288,11 @@ Run workflow 即可，每次 1 封、默认只发链接。
 
 ---
 
-## 本地手动跑法（境内机器）
+## 本地手动跑法（境内机器）与单元测试
 
 ```bash
+python3 -m unittest discover -s tests    # 跑核心工具与渲染逻辑单测
+python3 cloud/test_wait_active.py         # 跑 SCF 部署状态机 Mock 单测
 python3 monitor.py                        # 直接采集（会建历史基线）
 ./tools/publish.sh                        # 一键：采集 → 渲染 → 提交 → 推送 → Pages
 ./tools/publish.sh --no-push              # 只采集不推送

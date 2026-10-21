@@ -33,6 +33,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: 跑单元测试
+        run: |
+          pip install requests bs4
+          python3 -m unittest discover -s tests
+          python3 cloud/test_wait_active.py
+
       - name: 打 zip（Linux py3.10 manylinux 依赖）
         run: bash cloud/build.sh
 

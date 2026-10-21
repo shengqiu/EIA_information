@@ -176,6 +176,9 @@ https://1251234567-abcdefgh.ap-shanghai.tencentscf.com
 ### 2.6 测试
 
 ```bash
+# 本地 mock 状态机单测（可直接独立运行）
+python3 cloud/test_wait_active.py
+
 # 探活
 curl 'https://1251234567-abcdefgh.ap-shanghai.tencentscf.com?token=你的TOKEN'
 # → {"ok": true, "service": "huzhou-epi-scrape", "columns": 16, "auth": true}
