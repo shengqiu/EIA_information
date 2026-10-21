@@ -1,8 +1,8 @@
 {
  "failed": {
   "url|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/20267/c5a3df93565d4b7194244b1156c746dd.pdf?fileName=20260721%E5%85%AC%E7%A4%BA%E7%A8%BF--%E6%B5%99%E6%B1%9F%E6%B1%87%E9%9A%86%E6%96%B0%E6%9D%90%E6%96%99%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E5%B9%B4%E4%BA%A727%E4%B8%87%E5%90%A8%E7%BB%BF%E8%89%B2%E6%96%B0%E6%9D%90%E6%96%99%E5%8F%8A1000%E4%B8%87%E5%A5%97%E6%88%B7%E5%A4%96%E7%94%A8%E5%93%81%E6%95%B0%E5%AD%97%E5%8C%96%E5%B7%A5%E5%8E%82%E9%A1%B9%E7%9B%AE%E9%85%8D%E5%A5%97%E5%8F%8C%E5%9B%9E%E8%B7%AF%E4%BE%9B%E7%94%B5%E5%8F%98%E5%8E%8B%E7%B3%BB%E7%BB%9F%E9%A1%B9%E7%9B%AE%EF%BC%88%E5%85%AC%E7%A4%BA%E7%A8%BF%EF%BC%89.pdf": {
-   "at": "2026-10-21T07:57:45Z",
-   "error": "2026/10/21 07:57:57 NOTICE: Failed to copyurl: CopyURL failed: 403 Forbidden",
+   "at": "2026-10-21T20:13:35Z",
+   "error": "2026/10/21 20:13:46 NOTICE: Failed to copyurl: CopyURL failed: 403 Forbidden",
    "file": "20260721公示稿--浙江汇隆新材料股份有限公司年产27万吨绿色新材料及1000万套户外用品数字化工厂项目配套双回路供电变压系统项目（公示稿）.pdf"
   }
  },
@@ -133,6 +133,13 @@
    "file": "胜发金属（公示版）.rar",
    "inner": [
     "胜发金属（公示版）.pdf"
+   ]
+  },
+  "arc|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/b3bbf66c8b654192b9dfa54544943344.zip?fileName=%E5%85%AC%E7%A4%BA%E7%A8%BF%E6%B5%99%E6%B1%9F%E6%B2%83%E5%8B%92%E7%B2%BE%E5%AF%86%E6%9C%BA%E6%A2%B0%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E5%B9%B4%E4%BA%A7%E6%99%BA%E8%83%BD%E8%A3%85%E5%A4%87%E7%B2%BE%E5%AF%86%E9%9B%B6%E9%83%A8%E4%BB%B65%E4%B8%87%E5%A5%97%E5%BB%BA%E8%AE%BE%E9%A1%B9%E7%9B%AE%E7%8E%AF%E8%AF%84.zip": {
+   "at": "2026-10-21T20:13:35Z",
+   "file": "公示稿浙江沃勒精密机械有限公司年产智能装备精密零部件5万套建设项目环评.zip",
+   "inner": [
+    "公示稿浙江沃勒精密机械有限公司年产智能装备精密零部件5万套建设项目环评.pdf"
    ]
   },
   "arc|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/b473ba576afd47328d06963761a531eb.rar?fileName=%E5%85%AC%E7%A4%BA%E7%A8%BF-%E6%B5%99%E6%B1%9F%E7%BF%83%E8%BE%BE%E6%99%BA%E8%83%BD%E8%A3%85%E5%A4%87%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E9%AB%98%E7%AB%AF%E6%99%BA%E8%83%BD%E9%92%8E%E7%84%8A%E7%82%89%E7%83%AD%E5%A4%84%E7%90%86%E8%AE%BE%E5%A4%87%E9%A1%B9%E7%9B%AE_%E5%B7%B2%E6%A0%87%E8%AE%B0%E5%AF%86%E6%96%87.rar": {
@@ -727,6 +734,12 @@
    "dest": "gdrive:湖州/年产5万套除湿机外壳项目/胜发金属（公示版）.pdf",
    "file": "胜发金属（公示版）.pdf",
    "size": 2929468
+  },
+  "file|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/b3bbf66c8b654192b9dfa54544943344.zip?fileName=%E5%85%AC%E7%A4%BA%E7%A8%BF%E6%B5%99%E6%B1%9F%E6%B2%83%E5%8B%92%E7%B2%BE%E5%AF%86%E6%9C%BA%E6%A2%B0%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E5%B9%B4%E4%BA%A7%E6%99%BA%E8%83%BD%E8%A3%85%E5%A4%87%E7%B2%BE%E5%AF%86%E9%9B%B6%E9%83%A8%E4%BB%B65%E4%B8%87%E5%A5%97%E5%BB%BA%E8%AE%BE%E9%A1%B9%E7%9B%AE%E7%8E%AF%E8%AF%84.zip#公示稿浙江沃勒精密机械有限公司年产智能装备精密零部件5万套建设项目环评.pdf": {
+   "at": "2026-10-21T20:13:35Z",
+   "dest": "gdrive:湖州/年产智能装备精密零部件5万套建设项目/公示稿浙江沃勒精密机械有限公司年产智能装备精密零部件5万套建设项目环评.pdf",
+   "file": "公示稿浙江沃勒精密机械有限公司年产智能装备精密零部件5万套建设项目环评.pdf",
+   "size": 16381893
   },
   "file|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/b473ba576afd47328d06963761a531eb.rar?fileName=%E5%85%AC%E7%A4%BA%E7%A8%BF-%E6%B5%99%E6%B1%9F%E7%BF%83%E8%BE%BE%E6%99%BA%E8%83%BD%E8%A3%85%E5%A4%87%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E9%AB%98%E7%AB%AF%E6%99%BA%E8%83%BD%E9%92%8E%E7%84%8A%E7%82%89%E7%83%AD%E5%A4%84%E7%90%86%E8%AE%BE%E5%A4%87%E9%A1%B9%E7%9B%AE_%E5%B7%B2%E6%A0%87%E8%AE%B0%E5%AF%86%E6%96%87.rar#公示稿-浙江翃达智能装备有限公司高端智能钎焊炉热处理设备项目_已标记密文.pdf": {
    "at": "2026-10-16T01:10:40Z",
@@ -1513,6 +1526,12 @@
    "dest": "gdrive:湖州线索/年产新能源汽车内饰材料及相关配件10万套建设项目/网页内容.txt",
    "file": "网页内容.txt",
    "size": 3494
+  },
+  "text|年产智能装备精密零部件5万套建设项目": {
+   "at": "2026-10-21T20:12:43Z",
+   "dest": "gdrive:湖州/年产智能装备精密零部件5万套建设项目/网页内容.txt",
+   "file": "网页内容.txt",
+   "size": 1896
   },
   "text|年产电梯井架600台、铝合金门4500道、电锁4000把、轿厢300台项目": {
    "at": "2026-10-16T01:59:37Z",
