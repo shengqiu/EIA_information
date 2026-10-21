@@ -15,6 +15,15 @@ _spec = importlib.util.spec_from_file_location(
 dt = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(dt)
 
+# 确保测试用的 dummy zip 包存在（不依赖提前跑 build.sh）
+zip_path = os.path.join(_here, "dist", "huzhou-scrape.zip")
+created_dummy_zip = False
+if not os.path.exists(zip_path):
+    os.makedirs(os.path.dirname(zip_path), exist_ok=True)
+    with open(zip_path, "wb") as _f:
+        _f.write(b"PK\x05\x06" + b"\x00" * 18)  # 空 zip 标识
+    created_dummy_zip = True
+
 os.environ["TENCENTCLOUD_SECRET_ID"] = "AKIDtest"
 os.environ["TENCENTCLOUD_SECRET_KEY"] = "testkey"
 
@@ -78,5 +87,11 @@ st = dt.wait_active("huzhou-epi-scrape", "sid", "skey", "ap-shanghai",
                     tries=1, interval=0)
 assert st == "", f"超时应返回空串, got {st!r}"
 print("✓ wait_active 超时降级正常（不无限等）")
+
+if created_dummy_zip and os.path.exists(zip_path):
+    try:
+        os.remove(zip_path)
+    except Exception:
+        pass
 
 print("\n全部通过")

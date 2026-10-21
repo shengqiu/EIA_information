@@ -22,6 +22,7 @@
 | SCF 部署 | ✅ **全自动**：`cloud/**` 改动推 main → `deploy-scf.yml` 打包+更新函数+冒烟测试（2026-10-16 实测通过，修掉了 Updating 态竞态） |
 | Drive 同步 | ✅ `drive.yml`：按项目扁平一层（`湖州线索/<项目>/网页内容.txt + 解压后附件`），OAuth 模式，改脚本即自动跑 |
 | 共享层 | ✅ `tools/eia_common.py`（2026-10-18）：数据加载/正文渲染/解压/文件名还原抽成共享模块，`to_drive.py` 改用，`--dry-run` 回归输出逐字节一致 |
+| 单元测试 | ✅ `tests/` 套件（`python3 -m unittest discover -s tests`）与 `cloud/test_wait_active.py` Mock 测试打通，并在 CI 工作流中全自动运行 |
 | Confluence 迁移 | ❌ **已放弃（2026-10-18）**：评估后实现过半，因 Free 计划仅 2GB 存储（附件月增 ≈442MB，只能撑 ~5 个月）而放弃；附件存储继续走 Google Drive。决策记录见待办区 |
 
 ## ⚠️ 头号约束：境外 IP 访问不了 hbj.huzhou.gov.cn

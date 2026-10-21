@@ -69,6 +69,9 @@ jobs:
           python3 tools/fetch_remote.py --resolve-missing || true
 
       # 路线 B：本机直接抓 —— 只有境内 runner 才有效
+      - name: 跑单元测试
+        run: python3 -m unittest discover -s tests
+
       - name: 本机采集
         if: ${{ vars.SCRAPE_MODE == 'local' }}
         run: python3 monitor.py
