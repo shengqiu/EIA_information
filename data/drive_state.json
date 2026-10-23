@@ -1,8 +1,8 @@
 {
  "failed": {
   "url|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/20267/c5a3df93565d4b7194244b1156c746dd.pdf?fileName=20260721%E5%85%AC%E7%A4%BA%E7%A8%BF--%E6%B5%99%E6%B1%9F%E6%B1%87%E9%9A%86%E6%96%B0%E6%9D%90%E6%96%99%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E5%B9%B4%E4%BA%A727%E4%B8%87%E5%90%A8%E7%BB%BF%E8%89%B2%E6%96%B0%E6%9D%90%E6%96%99%E5%8F%8A1000%E4%B8%87%E5%A5%97%E6%88%B7%E5%A4%96%E7%94%A8%E5%93%81%E6%95%B0%E5%AD%97%E5%8C%96%E5%B7%A5%E5%8E%82%E9%A1%B9%E7%9B%AE%E9%85%8D%E5%A5%97%E5%8F%8C%E5%9B%9E%E8%B7%AF%E4%BE%9B%E7%94%B5%E5%8F%98%E5%8E%8B%E7%B3%BB%E7%BB%9F%E9%A1%B9%E7%9B%AE%EF%BC%88%E5%85%AC%E7%A4%BA%E7%A8%BF%EF%BC%89.pdf": {
-   "at": "2026-10-23T07:52:58Z",
-   "error": "2026/10/23 07:53:43 NOTICE: Failed to copyurl: CopyURL failed: 403 Forbidden",
+   "at": "2026-10-23T20:00:46Z",
+   "error": "2026/10/23 20:01:30 NOTICE: Failed to copyurl: CopyURL failed: 403 Forbidden",
    "file": "20260721公示稿--浙江汇隆新材料股份有限公司年产27万吨绿色新材料及1000万套户外用品数字化工厂项目配套双回路供电变压系统项目（公示稿）.pdf"
   }
  },
@@ -28,6 +28,20 @@
    "file": "九里桥港生态修复和沿岸道路景观提升工程.zip",
    "inner": [
     "九里桥港生态修复和沿岸道路景观提升工程.pdf"
+   ]
+  },
+  "arc|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/0c65025c4bf44c53abb683182ee0e34c.zip?fileName=%E5%85%AC%E7%A4%BA%E7%A8%BF-%E6%B9%96%E5%B7%9E%E7%A7%80%E9%BE%99%E5%8C%85%E8%A3%85%E6%9D%90%E6%96%99%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E6%B9%96%E5%B7%9E%E7%A7%80%E9%BE%99%E5%B9%B4%E4%BA%A72%E4%B8%87%E5%90%A8%E9%A3%9F%E5%93%81%E5%8C%85%E8%A3%85%E5%88%B6%E5%93%81%E5%8F%8A%E7%89%87%E6%9D%90%E9%A1%B9%E7%9B%AE%E7%8E%AF%E8%AF%84%E6%8A%A5%E5%91%8A%E8%A1%A8.pdf.zip": {
+   "at": "2026-10-23T20:00:46Z",
+   "file": "公示稿-湖州秀龙包装材料有限公司湖州秀龙年产2万吨食品包装制品及片材项目环评报告表.pdf.zip",
+   "inner": [
+    "公示稿-湖州秀龙包装材料有限公司湖州秀龙年产2万吨食品包装制品及片材项目环评报告表.pdf"
+   ]
+  },
+  "arc|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/11b486d2c5cd4da4886d44fe4da29d29.rar?fileName=%EF%BC%88%E5%85%AC%E7%A4%BA%E7%A8%BF%EF%BC%89BG-ZFFB25220067%E6%B5%99%E6%B1%9F%E4%B9%85%E7%AB%8B%E7%89%B9%E6%9D%90%E7%A7%91%E6%8A%80%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E6%96%B0%E5%BB%BA%E5%B9%B4%E4%BA%A710000%E5%90%A8%E6%B2%B9%E6%B0%94%E8%BE%93%E9%80%81%E7%94%A8%E5%A4%8D%E5%90%88%E7%AE%A1%E9%A1%B9%E7%9B%AE%E9%85%8D%E5%A5%97%E6%A0%B8%E6%8A%80%E6%9C%AF%E5%88%A9%E7%94%A8%E5%BB%BA%E8%AE%BE%E9%A1%B9%E7%9B%AE%EF%BC%89.rar": {
+   "at": "2026-10-23T20:00:33Z",
+   "file": "（公示稿）BG-ZFFB25220067浙江久立特材科技股份有限公司新建年产10000吨油气输送用复合管项目配套核技术利用建设项目）.rar",
+   "inner": [
+    "（公示稿）BG-ZFFB25220067浙江久立特材科技股份有限公司新建年产10000吨油气输送用复合管项目配套核技术利用建设项目）.pdf"
    ]
   },
   "arc|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/200c0540d29d4cf6b6af4eef7e150e03.zip?fileName=%E5%96%84%E5%90%AB%E4%B8%AD%E6%A0%BC%E5%B1%80%E7%81%8C%E5%8C%BA%E7%BB%AD%E5%BB%BA%E9%85%8D%E5%A5%97%E4%B8%8E%E7%8E%B0%E4%BB%A3%E5%8C%96%E6%94%B9%E9%80%A0%E9%A1%B9%E7%9B%AE%E5%85%A8%E6%9C%AC.zip": {
@@ -77,6 +91,13 @@
    "file": "（公示本）浙江矩辅科技有限公司智能鼓式制动系统建设项目.rar",
    "inner": [
     "（公示本）浙江矩辅科技有限公司智能鼓式制动系统建设项目.pdf"
+   ]
+  },
+  "arc|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/6b459d42f2a04b95bd9bb9c879df9b8e.rar?fileName=%E6%B5%99%E6%B1%9F%E5%8D%8E%E5%8A%9B%E6%B1%BD%E8%BD%A6%E9%85%8D%E4%BB%B6%E7%A7%91%E6%8A%80%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8X%E5%B0%84%E7%BA%BF%E5%AE%9E%E6%97%B6%E6%88%90%E5%83%8F%E6%A3%80%E6%B5%8B%E8%A3%85%E7%BD%AE%E6%96%B0%E5%BB%BA%E9%A1%B9%E7%9B%AE%E7%8E%AF%E8%AF%84%E6%8A%A5%E5%91%8A%EF%BC%88%E5%85%AC%E7%A4%BA%E7%A8%BF%EF%BC%89%282%29.rar": {
+   "at": "2026-10-23T19:59:55Z",
+   "file": "浙江华力汽车配件科技有限公司X射线实时成像检测装置新建项目环评报告（公示稿）(2).rar",
+   "inner": [
+    "浙江华力汽车配件科技有限公司X射线实时成像检测装置新建项目环评报告（公示稿）(2).pdf"
    ]
   },
   "arc|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/721c9fbf107c427dadd264dbb624501b.rar?fileName=%E6%B5%99%E6%B1%9F%E5%BD%AC%E8%85%BE%E7%A7%91%E6%8A%80%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E5%B9%B4%E4%BA%A713%E4%B8%87%E5%A5%97%E9%AB%98%E4%BD%8E%E5%8E%8B%E6%88%90%E5%A5%97%E8%AE%BE%E5%A4%87%E6%8A%80%E6%94%B9%E9%A1%B9%E7%9B%AE%E7%8E%AF%E5%A2%83%E5%BD%B1%E5%93%8D%E6%8A%A5%E5%91%8A%E8%A1%A8%EF%BC%88%E5%85%AC%E7%A4%BA%E7%A8%BF%EF%BC%89.rar": {
@@ -659,6 +680,18 @@
    "file": "九里桥港生态修复和沿岸道路景观提升工程.pdf",
    "size": 10997087
   },
+  "file|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/0c65025c4bf44c53abb683182ee0e34c.zip?fileName=%E5%85%AC%E7%A4%BA%E7%A8%BF-%E6%B9%96%E5%B7%9E%E7%A7%80%E9%BE%99%E5%8C%85%E8%A3%85%E6%9D%90%E6%96%99%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E6%B9%96%E5%B7%9E%E7%A7%80%E9%BE%99%E5%B9%B4%E4%BA%A72%E4%B8%87%E5%90%A8%E9%A3%9F%E5%93%81%E5%8C%85%E8%A3%85%E5%88%B6%E5%93%81%E5%8F%8A%E7%89%87%E6%9D%90%E9%A1%B9%E7%9B%AE%E7%8E%AF%E8%AF%84%E6%8A%A5%E5%91%8A%E8%A1%A8.pdf.zip#公示稿-湖州秀龙包装材料有限公司湖州秀龙年产2万吨食品包装制品及片材项目环评报告表.pdf": {
+   "at": "2026-10-23T20:00:46Z",
+   "dest": "gdrive:湖州/湖州秀龙年产2万吨食品包装制品及片材项目/公示稿-湖州秀龙包装材料有限公司湖州秀龙年产2万吨食品包装制品及片材项目环评报告表.pdf",
+   "file": "公示稿-湖州秀龙包装材料有限公司湖州秀龙年产2万吨食品包装制品及片材项目环评报告表.pdf",
+   "size": 2825076
+  },
+  "file|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/11b486d2c5cd4da4886d44fe4da29d29.rar?fileName=%EF%BC%88%E5%85%AC%E7%A4%BA%E7%A8%BF%EF%BC%89BG-ZFFB25220067%E6%B5%99%E6%B1%9F%E4%B9%85%E7%AB%8B%E7%89%B9%E6%9D%90%E7%A7%91%E6%8A%80%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E6%96%B0%E5%BB%BA%E5%B9%B4%E4%BA%A710000%E5%90%A8%E6%B2%B9%E6%B0%94%E8%BE%93%E9%80%81%E7%94%A8%E5%A4%8D%E5%90%88%E7%AE%A1%E9%A1%B9%E7%9B%AE%E9%85%8D%E5%A5%97%E6%A0%B8%E6%8A%80%E6%9C%AF%E5%88%A9%E7%94%A8%E5%BB%BA%E8%AE%BE%E9%A1%B9%E7%9B%AE%EF%BC%89.rar#（公示稿）BG-ZFFB25220067浙江久立特材科技股份有限公司新建年产10000吨油气输送用复合管项目配套核技术利用建设项目）.pdf": {
+   "at": "2026-10-23T20:00:33Z",
+   "dest": "gdrive:湖州/浙江久立特材科技股份有限公司新建年产10000吨油气输送用复 合管项目配套核技术利用建设项目/（公示稿）BG-ZFFB25220067浙江久立特材科技股份有限公司新建年产10000吨油气输送用复合管项目配套核技术利用建设项目）.pdf",
+   "file": "（公示稿）BG-ZFFB25220067浙江久立特材科技股份有限公司新建年产10000吨油气输送用复合管项目配套核技术利用建设项目）.pdf",
+   "size": 40494539
+  },
   "file|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/200c0540d29d4cf6b6af4eef7e150e03.zip?fileName=%E5%96%84%E5%90%AB%E4%B8%AD%E6%A0%BC%E5%B1%80%E7%81%8C%E5%8C%BA%E7%BB%AD%E5%BB%BA%E9%85%8D%E5%A5%97%E4%B8%8E%E7%8E%B0%E4%BB%A3%E5%8C%96%E6%94%B9%E9%80%A0%E9%A1%B9%E7%9B%AE%E5%85%A8%E6%9C%AC.zip#善含中格局灌区续建配套与现代化改造项目全本.pdf": {
    "at": "2026-10-16T01:20:42Z",
    "dest": "gdrive:湖州线索/善含中格局灌区续建配套与现代化改造项目/善含中格局灌区续建配套与现代化改造项目全本.pdf",
@@ -700,6 +733,12 @@
    "dest": "gdrive:湖州线索/智能鼓式制动系统建设项目/（公示本）浙江矩辅科技有限公司智能鼓式制动系统建设项目.pdf",
    "file": "（公示本）浙江矩辅科技有限公司智能鼓式制动系统建设项目.pdf",
    "size": 12941609
+  },
+  "file|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/6b459d42f2a04b95bd9bb9c879df9b8e.rar?fileName=%E6%B5%99%E6%B1%9F%E5%8D%8E%E5%8A%9B%E6%B1%BD%E8%BD%A6%E9%85%8D%E4%BB%B6%E7%A7%91%E6%8A%80%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8X%E5%B0%84%E7%BA%BF%E5%AE%9E%E6%97%B6%E6%88%90%E5%83%8F%E6%A3%80%E6%B5%8B%E8%A3%85%E7%BD%AE%E6%96%B0%E5%BB%BA%E9%A1%B9%E7%9B%AE%E7%8E%AF%E8%AF%84%E6%8A%A5%E5%91%8A%EF%BC%88%E5%85%AC%E7%A4%BA%E7%A8%BF%EF%BC%89%282%29.rar#浙江华力汽车配件科技有限公司X射线实时成像检测装置新建项目环评报告（公示稿）(2).pdf": {
+   "at": "2026-10-23T19:59:54Z",
+   "dest": "gdrive:湖州/浙江华力汽车配件科技有限公司 X 射线实时成像检测装置新建项目/浙江华力汽车配件科技有限公司X射线实时成像检测装置新建项目环评报告（公示稿）(2).pdf",
+   "file": "浙江华力汽车配件科技有限公司X射线实时成像检测装置新建项目环评报告（公示稿）(2).pdf",
+   "size": 12062689
   },
   "file|https://zjjcmspublicnew.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/cms_files/filemanager/1572864/attach/202610/721c9fbf107c427dadd264dbb624501b.rar?fileName=%E6%B5%99%E6%B1%9F%E5%BD%AC%E8%85%BE%E7%A7%91%E6%8A%80%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E5%B9%B4%E4%BA%A713%E4%B8%87%E5%A5%97%E9%AB%98%E4%BD%8E%E5%8E%8B%E6%88%90%E5%A5%97%E8%AE%BE%E5%A4%87%E6%8A%80%E6%94%B9%E9%A1%B9%E7%9B%AE%E7%8E%AF%E5%A2%83%E5%BD%B1%E5%93%8D%E6%8A%A5%E5%91%8A%E8%A1%A8%EF%BC%88%E5%85%AC%E7%A4%BA%E7%A8%BF%EF%BC%89.rar#浙江彬腾科技股份有限公司年产13万套高低压成套设备技改项目环境影响报告表（公示稿）.pdf": {
    "at": "2026-10-16T01:08:50Z",
@@ -1625,6 +1664,18 @@
    "file": "网页内容.txt",
    "size": 1822
   },
+  "text|浙江久立特材科技股份有限公司新建年产10000吨油气输送用复 合管项目配套核技术利用建设项目": {
+   "at": "2026-10-23T19:59:55Z",
+   "dest": "gdrive:湖州/浙江久立特材科技股份有限公司新建年产10000吨油气输送用复 合管项目配套核技术利用建设项目/网页内容.txt",
+   "file": "网页内容.txt",
+   "size": 2035
+  },
+  "text|浙江华力汽车配件科技有限公司 X 射线实时成像检测装置新建项目": {
+   "at": "2026-10-23T19:59:38Z",
+   "dest": "gdrive:湖州/浙江华力汽车配件科技有限公司 X 射线实时成像检测装置新建项目/网页内容.txt",
+   "file": "网页内容.txt",
+   "size": 1942
+  },
   "text|浙江华欣半导体科技有限公司半导体封装及成品、研发、销售产业链项目": {
    "at": "2026-10-16T01:20:42Z",
    "dest": "gdrive:湖州线索/浙江华欣半导体科技有限公司半导体封装及成品、研发、销售产业链项目/网页内容.txt",
@@ -1804,6 +1855,12 @@
    "dest": "gdrive:湖州线索/湖州皖哲智能家居科技有限公司年产地板脚线200万支、木龙骨1万立方米及实木地板芯板20万张项目/网页内容.txt",
    "file": "网页内容.txt",
    "size": 3647
+  },
+  "text|湖州秀龙年产2万吨食品包装制品及片材项目": {
+   "at": "2026-10-23T20:00:33Z",
+   "dest": "gdrive:湖州/湖州秀龙年产2万吨食品包装制品及片材项目/网页内容.txt",
+   "file": "网页内容.txt",
+   "size": 1938
   },
   "text|湖州美普兰精密锻造有限责任公司新增年产3000万件汽车关键部位轴承与齿轮精密锻件、 1800万件轿车轮毂单元与万向节、球笼精密锻件项目": {
    "at": "2026-10-16T05:17:39Z",
